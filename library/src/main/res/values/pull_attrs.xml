@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <declare-styleable name="PullLayout">
+        <attr name="pull_orientation" format="integer">
+            <enum name="horizontal" value="0"/>
+            <enum name="vertical" value="1"/>
+        </attr>
+        <attr name="pull_content_id" format="reference"/>
+        <attr name="pull_left_id" format="reference"/>
+        <attr name="pull_top_id" format="reference"/>
+        <attr name="pull_right_id" format="reference"/>
+        <attr name="pull_bottom_id" format="reference"/>
+        <attr name="pull_resistance" format="float"/>
+        <attr name="pull_pin_content" format="boolean"/>
+        <attr name="pull_max_range" format="fraction"/>
+        <attr name="pull_close_back_time" format="integer"/>
+    </declare-styleable>
+</resources>
