@@ -10,11 +10,11 @@ import android.view.animation.RotateAnimation;
 import android.widget.FrameLayout;
 import android.widget.TextView;
 
-import com.ccswdata.test.R;
-import com.ccswdata.test.pull.PullUIHandler;
-
 import java.text.SimpleDateFormat;
 import java.util.Date;
+
+import cn.sskbskdrin.pull.PullUIHandler;
+import cn.sskbskdrin.pull.R;
 
 public class ClassicHeader extends FrameLayout implements PullUIHandler {
 
