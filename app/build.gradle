@@ -20,4 +20,6 @@ android {
 
 dependencies {
     compile fileTree(include: ['*.jar'], dir: 'libs')
+    compile 'cn.sskbskdrin:base:1.0.0'
+    compile project(':library')
 }

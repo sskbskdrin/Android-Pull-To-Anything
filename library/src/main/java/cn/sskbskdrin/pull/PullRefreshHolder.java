@@ -253,6 +253,7 @@ public class PullRefreshHolder implements PullPositionChangeListener {
 			if (mView != null) {
 				mView.offsetLeftAndRight(dx);
 				mView.offsetTopAndBottom(dy);
+				Log.d(TAG,"update;top="+mView.getTop());
 			}
 			for (UIHandlerHolder holder : mHandlerHolders) {
 				holder.updatePosition(dx, dy, offsetX, offsetY);

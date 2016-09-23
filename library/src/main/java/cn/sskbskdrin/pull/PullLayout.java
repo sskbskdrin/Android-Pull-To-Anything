@@ -140,7 +140,7 @@ public class PullLayout extends ViewGroup {
 			mContentView.layout(l, t, r, b);
 		}
 		if (mPullRefreshHolder != null) {
-			mPullRefreshHolder.layout(getPaddingLeft(), getPaddingTop(), right - getPaddingRight(), bottom - getPaddingBottom());
+			mPullRefreshHolder.layout(getPaddingLeft(), getPaddingTop(), right - getPaddingRight() - left, bottom - getPaddingBottom() - top);
 		}
 		layoutChildren(left, top, right, bottom);
 	}
@@ -274,7 +274,7 @@ public class PullLayout extends ViewGroup {
 		for (PullPositionChangeListener listener : mListeners) {
 			listener.onUIPositionChange(deltaX, deltaY, mPullIndicator.getCurrentX(), mPullIndicator.getCurrentY(), 0);
 		}
-//		Log.d(TAG, "movePos: content left=" + mContentView.getLeft() + " top=" + mContentView.getTop());
+		Log.d(TAG, "movePos: content left=" + mContentView.getLeft() + " top=" + mContentView.getTop());
 		invalidate();
 	}
 

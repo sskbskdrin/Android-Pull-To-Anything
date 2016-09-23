@@ -44,9 +44,9 @@ public class MaterialHeader extends View implements PullUIHandler {
 		initView();
 	}
 
-	public void setPtrFrameLayout(PullLayout layout) {
+	public void setRefreshHolder(PullRefreshHolder holder, PullRefreshHolder.Direction direction) {
 
-		final PullUIHandlerHook mPtrUIHandlerHook = new PullUIHandlerHook(PullRefreshHolder.Direction.TOP) {
+		final PullUIHandlerHook mPtrUIHandlerHook = new PullUIHandlerHook(direction) {
 			@Override
 			public void run() {
 				startAnimation(mScaleAnimation);
@@ -70,7 +70,7 @@ public class MaterialHeader extends View implements PullUIHandler {
 
 			}
 		});
-		layout.getPullRefreshHolder().setPullUIHandlerHook(mPtrUIHandlerHook);
+		holder.setPullUIHandlerHook(mPtrUIHandlerHook);
 	}
 
 	private void initView() {

@@ -50,13 +50,13 @@ public class ClassicHeader extends FrameLayout implements PullUIHandler {
 
 	protected void initViews(AttributeSet attrs) {
 		buildAnimation();
-		View.inflate(getContext(), R.layout.cube_ptr_classic_default_header, this);
+		View.inflate(getContext(), R.layout.pull_classic_default_header, this);
 
-		mRotateView = findViewById(R.id.ptr_classic_header_rotate_view);
+		mRotateView = findViewById(R.id.header_rotate_view);
 
-		mTitleTextView = (TextView) findViewById(R.id.ptr_classic_header_rotate_view_header_title);
-		mLastUpdateTextView = (TextView) findViewById(R.id.ptr_classic_header_rotate_view_header_last_update);
-		mProgressBar = findViewById(R.id.ptr_classic_header_rotate_view_progressbar);
+		mTitleTextView = (TextView) findViewById(R.id.header_rotate_view_header_title);
+		mLastUpdateTextView = (TextView) findViewById(R.id.header_rotate_view_header_last_update);
+		mProgressBar = findViewById(R.id.header_rotate_view_progressbar);
 
 		resetView();
 	}
