@@ -253,7 +253,7 @@ public class PullRefreshHolder implements PullPositionChangeListener {
 			if (mView != null) {
 				mView.offsetLeftAndRight(dx);
 				mView.offsetTopAndBottom(dy);
-				Log.d(TAG,"update;top="+mView.getTop());
+				Log.d(TAG, "update;top=" + mView.getTop());
 			}
 			for (UIHandlerHolder holder : mHandlerHolders) {
 				holder.updatePosition(dx, dy, offsetX, offsetY);
@@ -273,8 +273,7 @@ public class PullRefreshHolder implements PullPositionChangeListener {
 						result = Math.abs(mOffsetX) < extent ? mOffsetX : extent;
 					}
 				}
-				if (mHolder.mStatus == STATUS_COMPLETE)
-					result = Math.abs(result);
+				result = Math.abs(result);
 				if (mDirection == Direction.RIGHT || mDirection == Direction.BOTTOM)
 					result = -result;
 			}

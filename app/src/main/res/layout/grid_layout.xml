@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              xmlns:app="http://schemas.android.com/apk/res-auto"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent"
+              android:orientation="vertical">\
+    <include android:id="@+id/title_layout"
+             layout="@layout/title_layout"/>
+    <cn.sskbskdrin.pull.PullLayout android:id="@+id/grid_pull"
+                                   android:layout_width="match_parent"
+                                   android:layout_height="match_parent"
+                                   app:pull_bottom_id="@+id/grid_bottom"
+                                   app:pull_content_id="@+id/grid_content"
+                                   app:pull_top_id="@+id/grid_top">
+
+        <GridView android:id="@id/grid_content"
+                  android:layout_width="match_parent"
+                  android:layout_height="match_parent"
+                  android:horizontalSpacing="5dp"
+                  android:numColumns="3"
+                  android:verticalSpacing="5dp"/>
+
+        <cn.sskbskdrin.pull.refresh.ClassicHeader android:id="@id/grid_top"
+                                                  android:layout_width="match_parent"
+                                                  android:layout_height="wrap_content"/>
+
+        <cn.sskbskdrin.pull.refresh.MaterialHeader android:id="@id/grid_bottom"
+                                                   android:layout_width="match_parent"
+                                                   android:layout_height="wrap_content"/>
+
+    </cn.sskbskdrin.pull.PullLayout>
+</LinearLayout>

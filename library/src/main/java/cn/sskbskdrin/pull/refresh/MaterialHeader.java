@@ -96,7 +96,10 @@ public class MaterialHeader extends View implements PullUIHandler {
 	@Override
 	protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
 		int height = mDrawable.getIntrinsicHeight() + getPaddingTop() + getPaddingBottom();
+		int width = mDrawable.getIntrinsicWidth() + getPaddingLeft() + getPaddingRight();
+//		+ getPaddingTop() + getPaddingBottom();
 		heightMeasureSpec = MeasureSpec.makeMeasureSpec(height, MeasureSpec.EXACTLY);
+//		widthMeasureSpec = MeasureSpec.makeMeasureSpec(width, MeasureSpec.EXACTLY);
 		super.onMeasure(widthMeasureSpec, heightMeasureSpec);
 	}
 
@@ -119,7 +122,7 @@ public class MaterialHeader extends View implements PullUIHandler {
 
 	@Override
 	public int getRefreshExtent() {
-		return getMeasuredHeight();
+		return mDrawable.getIntrinsicWidth() + getPaddingTop() * 2;
 	}
 
 	@Override
