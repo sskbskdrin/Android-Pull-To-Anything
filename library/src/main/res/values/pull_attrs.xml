@@ -14,5 +14,14 @@
         <attr name="pull_pin_content" format="boolean"/>
         <attr name="pull_max_range" format="fraction"/>
         <attr name="pull_close_back_time" format="integer"/>
+        <attr name="pull_top" format="boolean"/>
+    </declare-styleable>
+    <declare-styleable name="PullLayout_Layout">
+        <attr name="pull_position" format="enum">
+            <enum name="left" value="0"/>
+            <enum name="top" value="1"/>
+            <enum name="right" value="2"/>
+            <enum name="bottom" value="3"/>
+        </attr>
     </declare-styleable>
 </resources>

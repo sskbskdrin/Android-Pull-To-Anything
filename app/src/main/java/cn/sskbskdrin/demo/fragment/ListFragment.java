@@ -8,6 +8,7 @@ import java.util.List;
 import cn.sskbskdrin.base.IBaseAdapter;
 import cn.sskbskdrin.base.IFragment;
 import cn.sskbskdrin.base.ViewHolder;
+import cn.sskbskdrin.demo.Adapter;
 import cn.sskbskdrin.demo.R;
 import cn.sskbskdrin.pull.PullLayout;
 import cn.sskbskdrin.pull.PullRefreshCallback;
@@ -29,17 +30,12 @@ public class ListFragment extends IFragment {
 
 	@Override
 	protected void initView() {
-		ListView listView = $(R.id.grid_content);
+		ListView listView = $(R.id.list_content);
 		list = new ArrayList<>();
 		for (int i = 'A'; i < 'Z'; i++) {
 			list.add((char) i + "");
 		}
-		mAdapter = new IBaseAdapter<String>(getContext(), list, R.layout.item_home) {
-			@Override
-			public void bindViewHolder(ViewHolder holder, String item) {
-				holder.setText(R.id.id_num, item);
-			}
-		};
+		mAdapter = new Adapter(getContext(), list);
 		listView.setAdapter(mAdapter);
 		final PullLayout layout = $(R.id.list_pull);
 		final PullRefreshHolder holder = layout.getPullRefreshHolder();

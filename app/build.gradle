@@ -2,7 +2,7 @@ apply plugin: 'com.android.application'
 
 android {
     compileSdkVersion 23
-    buildToolsVersion "24.0.2"
+    buildToolsVersion "24.0.1"
     defaultConfig {
         applicationId "cn.sskbskdrin.pull"
         minSdkVersion 10
@@ -20,6 +20,6 @@ android {
 
 dependencies {
     compile fileTree(include: ['*.jar'], dir: 'libs')
-    compile 'cn.sskbskdrin:base:1.0.0'
+    compile 'cn.sskbskdrin:ssk-base:0.0.4'
     compile project(':library')
 }

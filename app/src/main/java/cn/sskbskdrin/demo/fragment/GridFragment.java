@@ -16,7 +16,6 @@ import cn.sskbskdrin.pull.PullRefreshHolder;
 /**
  * Created by ayke on 2016/9/26 0026.
  */
-
 public class GridFragment extends IFragment {
 
 	private IBaseAdapter<String> mAdapter;

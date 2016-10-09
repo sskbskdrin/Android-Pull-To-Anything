@@ -4,8 +4,6 @@
               android:layout_width="match_parent"
               android:layout_height="match_parent"
               android:orientation="vertical">
-    <include android:id="@+id/title_layout"
-             layout="@layout/title_layout"/>
     <cn.sskbskdrin.pull.PullLayout android:id="@+id/list_pull"
                                    android:layout_width="match_parent"
                                    android:layout_height="match_parent"
@@ -23,7 +21,9 @@
 
         <cn.sskbskdrin.pull.refresh.MaterialHeader android:id="@id/list_bottom"
                                                    android:layout_width="match_parent"
-                                                   android:layout_height="wrap_content"/>
+                                                   android:layout_height="wrap_content"
+                                                   android:paddingBottom="10dp"
+                                                   android:paddingTop="10dp"/>
 
     </cn.sskbskdrin.pull.PullLayout>
 </LinearLayout>

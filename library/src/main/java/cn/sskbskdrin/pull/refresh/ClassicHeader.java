@@ -134,20 +134,11 @@ public class ClassicHeader extends FrameLayout implements PullUIHandler {
 
 	@Override
 	public void onUIRefreshPull() {
-		if (mRotateView != null) {
+		if (mRotateView != null && mRotateView.getVisibility() == VISIBLE) {
 			mRotateView.clearAnimation();
 			mRotateView.startAnimation(mReverseFlipAnimation);
 		}
 		mTitleTextView.setText(getResources().getString(R.string.cube_ptr_pull_down_to_refresh));
-	}
-
-	@Override
-	public void onUIRefreshPrepare() {
-		if (mRotateView != null) {
-			mRotateView.clearAnimation();
-			mRotateView.startAnimation(mFlipAnimation);
-		}
-		mTitleTextView.setText(getResources().getString(R.string.cube_ptr_release_to_refresh));
 
 		mShouldShowLastUpdate = true;
 		tryUpdateLastUpdateTime();
@@ -157,6 +148,15 @@ public class ClassicHeader extends FrameLayout implements PullUIHandler {
 
 		mRotateView.setVisibility(VISIBLE);
 		mTitleTextView.setVisibility(VISIBLE);
+	}
+
+	@Override
+	public void onUIRefreshPrepare() {
+		if (mRotateView != null) {
+			mRotateView.clearAnimation();
+			mRotateView.startAnimation(mFlipAnimation);
+		}
+		mTitleTextView.setText(getResources().getString(R.string.cube_ptr_release_to_refresh));
 	}
 
 	@Override
