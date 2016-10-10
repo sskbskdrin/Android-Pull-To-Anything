@@ -247,7 +247,6 @@ public class StoreHouseHeader extends View implements PullUIHandler {
 		canvas.restoreToCount(c1);
 	}
 
-	@Override
 	public int getRefreshExtent() {
 		return getMeasuredHeight();
 	}

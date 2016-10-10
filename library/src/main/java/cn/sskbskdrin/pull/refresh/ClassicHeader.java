@@ -18,7 +18,7 @@ import cn.sskbskdrin.pull.R;
 
 public class ClassicHeader extends FrameLayout implements PullUIHandler {
 
-	private final static String KEY_SharedPreferences = "cube_ptr_classic_last_update";
+	private final static String KEY_SharedPreferences = "pull_classic_last_update";
 	private static SimpleDateFormat sDataFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 	private int mRotateAniTime = 150;
 	private RotateAnimation mFlipAnimation;
@@ -120,7 +120,6 @@ public class ClassicHeader extends FrameLayout implements PullUIHandler {
 		mRotateView.setVisibility(INVISIBLE);
 	}
 
-	@Override
 	public int getRefreshExtent() {
 		return getMeasuredHeight();
 	}

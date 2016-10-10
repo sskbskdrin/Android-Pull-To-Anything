@@ -1,8 +1,6 @@
 package cn.sskbskdrin.pull;
 
 import android.util.Log;
-import android.view.View;
-import android.view.ViewGroup;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -31,21 +29,23 @@ public class PullRefreshHolder implements PullPositionChangeListener {
 	}
 
 	public enum Direction {
-		LEFT, TOP, RIGHT, BOTTOM, NONE
-	}
+		LEFT(0), TOP(1), RIGHT(2), BOTTOM(3), NONE(-1);
+		int mValue;
 
-	public void setRefreshView(Direction direction, View view) {
-		Log.d(TAG, "setRefreshView: direction=" + direction);
-		if (map.containsKey(direction)) {
-			map.get(direction).setView(view);
-		} else {
-			map.put(direction, new UIViewHolder(direction, view));
+		Direction(int value) {
+			mValue = value;
+		}
+
+		public int getValue() {
+			return mValue;
 		}
 	}
 
-	public void setEnable(Direction direction, boolean enable) {
+	public void setRefreshThreshold(Direction direction, int threshold) {
 		if (map.containsKey(direction)) {
-			map.get(direction).setEnable(enable);
+			map.get(direction).setRefreshThreshold(threshold);
+		} else {
+			map.put(direction, new UIViewHolder(direction, threshold));
 		}
 	}
 
@@ -90,50 +90,6 @@ public class PullRefreshHolder implements PullPositionChangeListener {
 		}
 	}
 
-	protected void layout(int l, int t, int r, int b) {
-		Log.d(TAG, "layout: l=" + l + " t=" + t + " r=" + r + " b=" + b);
-		for (Map.Entry<Direction, UIViewHolder> entry : map.entrySet()) {
-			UIViewHolder handler = entry.getValue();
-			Direction direction = entry.getKey();
-			View view = handler.getView();
-			if (view != null) {
-				int width = view.getMeasuredWidth();
-				int height = view.getMeasuredHeight();
-				ViewGroup.MarginLayoutParams mlp = (ViewGroup.MarginLayoutParams) view.getLayoutParams();
-				int left = l + mlp.leftMargin;
-				int top = t + mlp.topMargin;
-				int right = r - mlp.rightMargin;
-				int bottom = b - mlp.bottomMargin;
-				if (direction == Direction.LEFT) {
-					left = left - width + handler.mOffsetX - mlp.rightMargin - mlp.leftMargin;
-					view.layout(left, top, left + width, top + height);
-				}
-				if (direction == Direction.TOP) {
-					top = top - height + handler.mOffsetY - mlp.topMargin - mlp.bottomMargin;
-					view.layout(left, top, left + width, top + height);
-				}
-				if (direction == Direction.RIGHT) {
-					right = right + handler.mOffsetX + width + mlp.rightMargin + mlp.leftMargin;
-					view.layout(right - width, top, right, top + height);
-				}
-				if (direction == Direction.BOTTOM) {
-					bottom = bottom + handler.mOffsetY + height + mlp.topMargin + mlp.bottomMargin;
-					view.layout(left, bottom - height, left + width, bottom);
-				}
-				view.bringToFront();
-				Log.d(TAG, "layout: direction=" + direction + " l=" + left + " t=" + top + " r=" + right + " b=" + bottom);
-				Log.d(TAG, "layout: direction=" + direction + " l=" + view.getLeft() + " t=" + view.getTop() + " r=" + view.getRight() + " b=" + view.getBottom());
-			}
-		}
-	}
-
-	protected View getRefreshView(Direction direction) {
-		if (map.containsKey(direction)) {
-			return map.get(direction).getView();
-		}
-		return null;
-	}
-
 	protected int getResetExtent() {
 		int result = 0;
 		if (map.containsKey(mCurrentDirection)) {
@@ -171,39 +127,48 @@ public class PullRefreshHolder implements PullPositionChangeListener {
 	}
 
 	private static class UIViewHolder {
+		private int mStatus = STATUS_NONE;
 		private int mOffsetX = 0;
 		private int mOffsetY = 0;
-		private boolean isEnable = true;
-		private View mView;
-		private UIHandlerHolder mHolder;
-		private List<UIHandlerHolder> mHandlerHolders;
+		private List<PullUIHandler> mUIHandlers;
+		private List<PullRefreshCallback> mCallbacks;
 		private PullUIHandlerHook mHandlerHook;
+		private int mThreshold = 0;
 
 		private Direction mDirection;
 
 		public UIViewHolder(Direction direction, PullUIHandler handler) {
 			mDirection = direction;
-			mHandlerHolders = new ArrayList<>();
+			mCallbacks = new ArrayList<>();
+			mUIHandlers = new ArrayList<>();
 			addUIHandler(handler);
 		}
 
-		public UIViewHolder(Direction direction, View view) {
+		public UIViewHolder(Direction direction, int threshold) {
 			mDirection = direction;
-			mHandlerHolders = new ArrayList<>();
-			setView(view);
+			mUIHandlers = new ArrayList<>();
+			mCallbacks = new ArrayList<>();
+			mThreshold = threshold;
 		}
 
 		public void onTouchUp() {
-			for (UIHandlerHolder holder : mHandlerHolders) {
-				if (holder.mStatus == STATUS_PREPARE)
-					holder.updateStatus(STATUS_LOADING);
+			if (mStatus == STATUS_PREPARE) {
+				for (PullUIHandler handler : mUIHandlers) {
+					updateStatus(handler, STATUS_LOADING);
+				}
+				if (mCallbacks != null) {
+					for (PullRefreshCallback callback : mCallbacks) {
+						callback.onUIRefreshBegin();
+					}
+				}
 			}
 		}
 
 		public void refreshComplete() {
-			for (UIHandlerHolder holder : mHandlerHolders) {
-				if (holder.mStatus == STATUS_LOADING)
-					holder.updateStatus(STATUS_COMPLETE);
+			if (mStatus == STATUS_LOADING) {
+				for (PullUIHandler handler : mUIHandlers) {
+					updateStatus(handler, STATUS_COMPLETE);
+				}
 			}
 		}
 
@@ -216,99 +181,8 @@ public class PullRefreshHolder implements PullPositionChangeListener {
 		}
 
 		public void addUIHandler(PullUIHandler handler) {
-			UIHandlerHolder holder = new UIHandlerHolder(handler);
-			if (!mHandlerHolders.contains(holder)) {
-				mHandlerHolders.add(holder);
-				if (mHolder == null)
-					mHolder = holder;
-			}
-		}
-
-		public void addCallback(PullRefreshCallback callback) {
-			if (mHolder != null)
-				mHolder.addCallback(callback);
-		}
-
-		public void setEnable(boolean enable) {
-			isEnable = enable;
-		}
-
-		public void setView(View view) {
-			mView = view;
-			if (view instanceof PullUIHandler) {
-				addUIHandler((PullUIHandler) view);
-				mHolder = mHandlerHolders.get(0);
-			}
-		}
-
-		public View getView() {
-			return mView;
-		}
-
-		public void updatePosition(int dx, int dy, int offsetX, int offsetY) {
-			if (!isEnable)
-				return;
-			mOffsetX = offsetX;
-			mOffsetY = offsetY;
-			if (mView != null) {
-				mView.offsetLeftAndRight(dx);
-				mView.offsetTopAndBottom(dy);
-				Log.d(TAG, "update;top=" + mView.getTop());
-			}
-			for (UIHandlerHolder holder : mHandlerHolders) {
-				holder.updatePosition(dx, dy, offsetX, offsetY);
-			}
-		}
-
-		private int getResetExtent() {
-			int result = 0;
-			int extent = getRefreshExtent();
-			if (mHolder != null) {
-				if (mHolder.mStatus == STATUS_PREPARE)
-					result = extent;
-				if (mHolder.mStatus == STATUS_LOADING) {
-					if (isVertical()) {
-						result = Math.abs(mOffsetY) < extent ? mOffsetY : extent;
-					} else {
-						result = Math.abs(mOffsetX) < extent ? mOffsetX : extent;
-					}
-				}
-				result = Math.abs(result);
-				if (mDirection == Direction.RIGHT || mDirection == Direction.BOTTOM)
-					result = -result;
-			}
-			return result;
-		}
-
-		private int getRefreshExtent() {
-			int extent = 0;
-			if (mHolder != null) {
-				extent = mHolder.mHandler.getRefreshExtent();
-			} else {
-				if (mView != null) {
-					ViewGroup.MarginLayoutParams lp = (ViewGroup.MarginLayoutParams) mView.getLayoutParams();
-					if (isVertical()) {
-						extent = mView.getMeasuredHeight() + lp.topMargin + lp.bottomMargin;
-					} else {
-						extent = mView.getMeasuredWidth() + lp.leftMargin + lp.rightMargin;
-					}
-				}
-			}
-			return extent;
-		}
-
-		private boolean isVertical() {
-			return mDirection == Direction.TOP || mDirection == Direction.BOTTOM;
-		}
-	}
-
-	private static class UIHandlerHolder {
-		private int mStatus = STATUS_NONE;
-		private PullUIHandler mHandler;
-		private List<PullRefreshCallback> mCallbacks;
-
-		public UIHandlerHolder(PullUIHandler handler) {
-			mHandler = handler;
+			if (!mUIHandlers.contains(handler))
+				mUIHandlers.add(handler);
 		}
 
 		public void addCallback(PullRefreshCallback callback) {
@@ -319,62 +193,93 @@ public class PullRefreshHolder implements PullPositionChangeListener {
 		}
 
 		public void updatePosition(int dx, int dy, int offsetX, int offsetY) {
+			mOffsetX = offsetX;
+			mOffsetY = offsetY;
 			checkStatus(offsetX, offsetY);
-			mHandler.onUIPositionChange(dx, dy, offsetX, offsetY, mStatus);
+			for (PullUIHandler handler : mUIHandlers) {
+				handler.onUIPositionChange(dx, dy, offsetX, offsetY, mStatus);
+			}
+		}
+
+		private int getResetExtent() {
+			int result = 0;
+			int threshold = getRefreshThreshold();
+			if (mStatus == STATUS_PREPARE)
+				result = threshold;
+			if (mStatus == STATUS_LOADING) {
+				int offsetX = Math.abs(mOffsetX);
+				int offsetY = Math.abs(mOffsetY);
+				if (isVertical()) {
+					result = Math.min(offsetY, threshold);
+				} else {
+					result = Math.min(offsetX, threshold);
+				}
+			}
+			if (mDirection == Direction.RIGHT || mDirection == Direction.BOTTOM)
+				result = -result;
+			return result;
+		}
+
+		private boolean isVertical() {
+			return mDirection == Direction.TOP || mDirection == Direction.BOTTOM;
+		}
+
+		public int getRefreshThreshold() {
+			return mThreshold;
+		}
+
+		public void setRefreshThreshold(int threshold) {
+			if (mThreshold == 0)
+				this.mThreshold = threshold;
 		}
 
 		private void checkStatus(int offsetX, int offsetY) {
 			if (STATUS_LOADING != mStatus) {
 				int status = mStatus;
-				int extent = mHandler.getRefreshExtent();
+				int extent = getRefreshThreshold();
 				if (offsetX == 0 && offsetY == 0) {
 					mStatus = STATUS_NONE;
 				} else if (Math.abs(offsetX) > extent || Math.abs(offsetY) > extent) {
 					mStatus = STATUS_PREPARE;
-				} else if (mStatus != STATUS_COMPLETE) {
+				} else if (mStatus == STATUS_COMPLETE) {
+					mStatus = STATUS_COMPLETE;
+				} else {
 					mStatus = STATUS_PULL;
 				}
 				if (status != mStatus) {
-					updateStatus(mStatus);
+					for (PullUIHandler handler : mUIHandlers) {
+						updateStatus(handler, mStatus);
+					}
+					if (mStatus == STATUS_LOADING) {
+						if (mCallbacks != null) {
+							for (PullRefreshCallback callback : mCallbacks) {
+								callback.onUIRefreshBegin();
+							}
+						}
+					}
 				}
 			}
 		}
 
-		public void updateStatus(int status) {
-//			Log.d(TAG, "updateStatus: status=" + status);
+		public void updateStatus(PullUIHandler handler, int status) {
 			mStatus = status;
 			switch (mStatus) {
 				case STATUS_NONE:
-					mHandler.onUIReset();
+					handler.onUIReset();
 					break;
 				case STATUS_PULL:
-					mHandler.onUIRefreshPull();
+					handler.onUIRefreshPull();
 					break;
 				case STATUS_PREPARE:
-					mHandler.onUIRefreshPrepare();
+					handler.onUIRefreshPrepare();
 					break;
 				case STATUS_LOADING:
-					mHandler.onUIRefreshBegin();
-					if (mCallbacks != null) {
-						for (PullRefreshCallback callback : mCallbacks) {
-							callback.onUIRefreshBegin();
-						}
-					}
+					handler.onUIRefreshBegin();
 					break;
 				case STATUS_COMPLETE:
-					mHandler.onUIRefreshComplete();
+					handler.onUIRefreshComplete();
 					break;
 			}
 		}
-
-		@Override
-		public boolean equals(Object o) {
-			if (o instanceof UIHandlerHolder) {
-				return mHandler.equals(((UIHandlerHolder) o).mHandler);
-			}
-			return super.equals(o);
-		}
 	}
-
-
 }

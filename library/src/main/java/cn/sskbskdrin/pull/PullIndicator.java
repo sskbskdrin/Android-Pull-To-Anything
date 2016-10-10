@@ -15,7 +15,8 @@ public class PullIndicator {
 	private Point mLastPosition = new Point();
 	private int mMaxRange = Integer.MAX_VALUE;
 
-	private float mResistance = 0.5f;
+	private float mResistance = 1.5f;
+	private boolean isIncreaseResistance = true;
 
 	public float getResistance() {
 		int offset = Math.abs(mCurrentPosition.x);
@@ -23,10 +24,15 @@ public class PullIndicator {
 			offset = Math.abs(mCurrentPosition.y);
 		if (offset > mMaxRange)
 			offset = mMaxRange;
-		return mResistance * (mMaxRange - offset) / mMaxRange;
+		float scale = (mMaxRange - offset) * 1f / mMaxRange;
+		if (!isIncreaseResistance && scale != 0)
+			scale = 1;
+		return mResistance / scale;
 	}
 
 	public void setResistance(float resistance) {
+		if (resistance == 0)
+			throw new IllegalArgumentException("resistance Cannot be zero");
 		mResistance = resistance;
 	}
 
@@ -42,7 +48,7 @@ public class PullIndicator {
 
 	protected void processOnMove(float offsetX, float offsetY) {
 		float resistance = getResistance();
-		setOffset(offsetX * resistance, offsetY * resistance);
+		setOffset(offsetX / resistance, offsetY / resistance);
 	}
 
 	public void onPressDown(float x, float y) {
@@ -110,5 +116,13 @@ public class PullIndicator {
 
 	public boolean isAlreadyHere(int to) {
 		return mCurrentPosition.y == to;
+	}
+
+	public void setIncreaseResistance(boolean increaseResistance) {
+		isIncreaseResistance = increaseResistance;
+	}
+
+	public boolean isIncreaseResistance() {
+		return isIncreaseResistance;
 	}
 }

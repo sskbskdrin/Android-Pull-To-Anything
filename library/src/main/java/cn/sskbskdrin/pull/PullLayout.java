@@ -24,11 +24,6 @@ public class PullLayout extends ViewGroup {
 	public static final int HORIZONTAL = 0;
 	public static final int VERTICAL = 1;
 
-	private int mLeftViewId = 0;
-	private int mTopViewId = 0;
-	private int mRightViewId = 0;
-	private int mBottomViewId = 0;
-	private int mContentViewId = 0;
 	private View mContentView;
 
 	private boolean isPinContent = false;
@@ -64,14 +59,9 @@ public class PullLayout extends ViewGroup {
 		mListeners = new ArrayList<>();
 		TypedArray arr = context.obtainStyledAttributes(attrs, R.styleable.PullLayout, 0, 0);
 		if (arr != null) {
-			mContentViewId = arr.getResourceId(R.styleable.PullLayout_pull_content_id, mContentViewId);
-			mLeftViewId = arr.getResourceId(R.styleable.PullLayout_pull_left_id, mLeftViewId);
-			mTopViewId = arr.getResourceId(R.styleable.PullLayout_pull_top_id, mTopViewId);
-			mRightViewId = arr.getResourceId(R.styleable.PullLayout_pull_right_id, mRightViewId);
-			mBottomViewId = arr.getResourceId(R.styleable.PullLayout_pull_bottom_id, mBottomViewId);
-
 			mOrientation = arr.getInt(R.styleable.PullLayout_pull_orientation, VERTICAL);
 			mPullIndicator.setResistance(arr.getFloat(R.styleable.PullLayout_pull_resistance, mPullIndicator.getResistance()));
+			mPullIndicator.setIncreaseResistance(arr.getBoolean(R.styleable.PullLayout_pull_resistance_increase, mPullIndicator.isIncreaseResistance()));
 			mPullRangePercent = arr.getFraction(R.styleable.PullLayout_pull_max_range, 1, 1, mPullRangePercent);
 			isPinContent = arr.getBoolean(R.styleable.PullLayout_pull_pin_content, isPinContent);
 			mCloseBackTime = arr.getInteger(R.styleable.PullLayout_pull_close_back_time, mCloseBackTime);
@@ -82,8 +72,18 @@ public class PullLayout extends ViewGroup {
 	@Override
 	protected void onFinishInflate() {
 		int childCount = getChildCount();
-		if (mContentViewId != 0)
-			mContentView = findViewById(mContentViewId);
+		for (int i = 0; i < childCount; i++) {
+			View view = getChildAt(i);
+			LayoutParams lp = (LayoutParams) view.getLayoutParams();
+			if (lp.isContent) {
+				mContentView = view;
+			} else if (lp.direction != PullRefreshHolder.Direction.NONE) {
+				views[lp.direction.getValue()] = view;
+				if (view instanceof PullUIHandler) {
+					getPullRefreshHolder().addUIHandler(lp.direction, (PullUIHandler) view);
+				}
+			}
+		}
 		if (mContentView == null) {
 			if (childCount > 0)
 				mContentView = getChildAt(0);
@@ -97,19 +97,9 @@ public class PullLayout extends ViewGroup {
 			errorView.setText("The content view in PullLayout is empty. Do you forget to specify its id in xml layout file?");
 			mContentView = errorView;
 			addView(mContentView);
+			((LayoutParams) mContentView.getLayoutParams()).gravity = Gravity.CENTER;
 		}
-		if (mLeftViewId != 0) {
-			getPullRefreshHolder().setRefreshView(PullRefreshHolder.Direction.LEFT, findViewById(mLeftViewId));
-		}
-		if (mTopViewId != 0) {
-			getPullRefreshHolder().setRefreshView(PullRefreshHolder.Direction.TOP, findViewById(mTopViewId));
-		}
-		if (mRightViewId != 0) {
-			getPullRefreshHolder().setRefreshView(PullRefreshHolder.Direction.RIGHT, findViewById(mRightViewId));
-		}
-		if (mBottomViewId != 0) {
-			getPullRefreshHolder().setRefreshView(PullRefreshHolder.Direction.BOTTOM, findViewById(mBottomViewId));
-		}
+		((LayoutParams) mContentView.getLayoutParams()).isContent = true;
 		super.onFinishInflate();
 	}
 
@@ -118,57 +108,139 @@ public class PullLayout extends ViewGroup {
 		super.onMeasure(widthMeasureSpec, heightMeasureSpec);
 		int range = isVertical() ? getMeasuredHeight() : getMeasuredWidth();
 		mPullIndicator.setPullMaxRange((int) (mPullRangePercent * range));
-		for (int i = 0; i < getChildCount(); i++) {
-			measureChildWithMargins(getChildAt(i), widthMeasureSpec, 0, heightMeasureSpec, 0);
+		final int count = getChildCount();
+
+		int maxHeight = 0;
+		int maxWidth = 0;
+
+		// Find rightmost and bottommost child
+		for (int i = 0; i < count; i++) {
+			final View child = getChildAt(i);
+			if (child.getVisibility() != GONE) {
+				measureChildWithMargins(child, widthMeasureSpec, 0, heightMeasureSpec, 0);
+				maxWidth = Math.max(maxWidth, child.getMeasuredWidth());
+				maxHeight = Math.max(maxHeight, child.getMeasuredHeight());
+			}
 		}
+
+		// Account for padding too
+		maxWidth += getPaddingLeft() + getPaddingRight();
+		maxHeight += getPaddingTop() + getPaddingBottom();
+
+		// Check against our minimum height and width
+		maxHeight = Math.max(maxHeight, getSuggestedMinimumHeight());
+		maxWidth = Math.max(maxWidth, getSuggestedMinimumWidth());
+
+		setMeasuredDimension(resolveSize(maxWidth, widthMeasureSpec),
+				resolveSize(maxHeight, heightMeasureSpec));
 	}
 
 	@Override
 	protected void onLayout(boolean changed, int left, int top, int right, int bottom) {
-		if (mContentView != null) {
-			int offsetX = mPullIndicator.getCurrentX();
-			int offsetY = mPullIndicator.getCurrentY();
-			if (isPinContent) {
-				offsetX = 0;
-				offsetY = 0;
+		final int parentLeft = getPaddingLeft();
+		final int parentRight = right - left - getPaddingRight();
+		final int parentTop = getPaddingTop();
+		final int parentBottom = bottom - top - getPaddingBottom();
+
+		int offsetX = mPullIndicator.getCurrentX();
+		int offsetY = mPullIndicator.getCurrentY();
+		final int count = getChildCount();
+		for (int i = 0; i < count; i++) {
+			View view = getChildAt(i);
+			LayoutParams lp = (LayoutParams) view.getLayoutParams();
+			if (view instanceof PullUIHandler) {
+				getPullRefreshHolder().addUIHandler(lp.direction, (PullUIHandler) view);
+			} else if (view instanceof PullPositionChangeListener) {
+				addPullPositionChangeListener((PullPositionChangeListener) view);
 			}
-			MarginLayoutParams lp = (MarginLayoutParams) mContentView.getLayoutParams();
-			int l = getPaddingLeft() + lp.leftMargin + offsetX;
-			int t = getPaddingTop() + lp.topMargin + offsetY;
-			int r = right - left - getPaddingRight() - lp.rightMargin + offsetX;
-			int b = bottom - top - getPaddingBottom() - lp.bottomMargin + offsetY;
-			mContentView.layout(l, t, r, b);
+			if (lp.isContent) {
+				if (isPinContent) {
+					offsetX = 0;
+					offsetY = 0;
+				}
+				int l = parentLeft + lp.leftMargin + offsetX;
+				int t = parentTop + lp.topMargin + offsetY;
+				int r = parentRight - lp.rightMargin + offsetX;
+				int b = parentBottom - lp.bottomMargin + offsetY;
+				view.layout(l, t, r, b);
+				mContentView = view;
+			} else if (lp.direction != PullRefreshHolder.Direction.NONE) {
+				int width = view.getMeasuredWidth();
+				int height = view.getMeasuredHeight();
+				int l = parentLeft + lp.leftMargin;
+				int t = parentTop + lp.topMargin;
+				int r = parentRight - lp.rightMargin;
+				int b = parentBottom - lp.bottomMargin;
+				if (lp.direction == PullRefreshHolder.Direction.LEFT) {
+					l = l - width + offsetX - lp.rightMargin - lp.leftMargin;
+					view.layout(l, t, l + width, t + height);
+				}
+				if (lp.direction == PullRefreshHolder.Direction.TOP) {
+					t = t - height + offsetY - lp.topMargin - lp.bottomMargin;
+					view.layout(l, t, l + width, t + height);
+				}
+				if (lp.direction == PullRefreshHolder.Direction.RIGHT) {
+					r = r + offsetX + width + lp.rightMargin + lp.leftMargin;
+					view.layout(r - width, t, r, t + height);
+				}
+				if (lp.direction == PullRefreshHolder.Direction.BOTTOM) {
+					b = b + offsetY + height + lp.topMargin + lp.bottomMargin;
+					view.layout(l, b - height, l + width, b);
+				}
+				views[lp.direction.getValue()] = view;
+				getPullRefreshHolder().setRefreshThreshold(lp.direction, Math.min(view.getMeasuredHeight(), view.getMeasuredWidth()));
+				view.bringToFront();
+			} else {
+				layoutChildren(view, parentLeft, parentTop, parentRight, parentBottom);
+			}
 		}
-		if (mPullRefreshHolder != null) {
-			mPullRefreshHolder.layout(getPaddingLeft(), getPaddingTop(), right - getPaddingRight() - left, bottom - getPaddingBottom() - top);
-		}
-		layoutChildren(left, top, right, bottom);
 	}
 
-	private void layoutChildren(int left, int top, int right, int bottom) {
-		int paddingTop = getPaddingTop();
-		int paddingLeft = getPaddingLeft();
-		int paddingRight = getPaddingRight();
-		int paddingBottom = getPaddingBottom();
-		int childCount = getChildCount();
-		for (int i = 0; i < childCount; i++) {
-			View child = getChildAt(i);
-			if (checkRefreshView(child) || child.equals(mContentView))
-				continue;
-			MarginLayoutParams lp = (MarginLayoutParams) child.getLayoutParams();
-			int l = paddingLeft + lp.leftMargin;
-			int t = paddingTop + lp.topMargin;
-			int r = right - left - paddingRight - lp.rightMargin;
-			int b = bottom - top - paddingBottom - lp.bottomMargin;
-			child.layout(l, t, r, b);
-		}
-	}
+	private void layoutChildren(View child, int parentLeft, int parentTop, int parentRight, int parentBottom) {
+		final LayoutParams lp = (LayoutParams) child.getLayoutParams();
+		final int width = child.getMeasuredWidth();
+		final int height = child.getMeasuredHeight();
 
-	private boolean checkRefreshView(View view) {
-		return mPullRefreshHolder != null && (view.equals(mPullRefreshHolder.getRefreshView(PullRefreshHolder.Direction.LEFT))
-				|| view.equals(mPullRefreshHolder.getRefreshView(PullRefreshHolder.Direction.TOP))
-				|| view.equals(mPullRefreshHolder.getRefreshView(PullRefreshHolder.Direction.RIGHT))
-				|| view.equals(mPullRefreshHolder.getRefreshView(PullRefreshHolder.Direction.BOTTOM)));
+		int childLeft = parentLeft;
+		int childTop = parentTop;
+
+		final int gravity = lp.gravity;
+
+		if (gravity != -1) {
+			final int horizontalGravity = gravity & Gravity.HORIZONTAL_GRAVITY_MASK;
+			final int verticalGravity = gravity & Gravity.VERTICAL_GRAVITY_MASK;
+
+			switch (horizontalGravity) {
+				case Gravity.LEFT:
+					childLeft = parentLeft + lp.leftMargin;
+					break;
+				case Gravity.CENTER_HORIZONTAL:
+					childLeft = parentLeft + (parentRight - parentLeft - width) / 2 +
+							lp.leftMargin - lp.rightMargin;
+					break;
+				case Gravity.RIGHT:
+					childLeft = parentRight - width - lp.rightMargin;
+					break;
+				default:
+					childLeft = parentLeft + lp.leftMargin;
+			}
+
+			switch (verticalGravity) {
+				case Gravity.TOP:
+					childTop = parentTop + lp.topMargin;
+					break;
+				case Gravity.CENTER_VERTICAL:
+					childTop = parentTop + (parentBottom - parentTop - height) / 2 +
+							lp.topMargin - lp.bottomMargin;
+					break;
+				case Gravity.BOTTOM:
+					childTop = parentBottom - height - lp.bottomMargin;
+					break;
+				default:
+					childTop = parentTop + lp.topMargin;
+			}
+		}
+		child.layout(childLeft, childTop, childLeft + width, childTop + height);
 	}
 
 	void reset(int offset) {
@@ -271,11 +343,35 @@ public class PullLayout extends ViewGroup {
 			mContentView.offsetLeftAndRight(deltaX);
 			mContentView.offsetTopAndBottom(deltaY);
 		}
-		for (PullPositionChangeListener listener : mListeners) {
-			listener.onUIPositionChange(deltaX, deltaY, mPullIndicator.getCurrentX(), mPullIndicator.getCurrentY(), 0);
-		}
-		Log.d(TAG, "movePos: content left=" + mContentView.getLeft() + " top=" + mContentView.getTop());
+		updatePosition(deltaX, deltaY, mPullIndicator.getCurrentX(), mPullIndicator.getCurrentY(), isUnderTouch);
 		invalidate();
+	}
+
+	PullRefreshHolder.Direction mCurrentDirection = PullRefreshHolder.Direction.NONE;
+	View[] views = new View[4];
+
+	private void updatePosition(int dx, int dy, int offsetX, int offsetY, boolean isUnderTouch) {
+		PullRefreshHolder.Direction old = mCurrentDirection;
+		if (offsetX > 0) {
+			mCurrentDirection = PullRefreshHolder.Direction.LEFT;
+		} else if (offsetX < 0) {
+			mCurrentDirection = PullRefreshHolder.Direction.RIGHT;
+		} else if (offsetY > 0) {
+			mCurrentDirection = PullRefreshHolder.Direction.TOP;
+		} else if (offsetY < 0) {
+			mCurrentDirection = PullRefreshHolder.Direction.BOTTOM;
+		} else {
+			mCurrentDirection = PullRefreshHolder.Direction.NONE;
+		}
+		PullRefreshHolder.Direction used = mCurrentDirection == PullRefreshHolder.Direction.NONE ? old : mCurrentDirection;
+		if (used != PullRefreshHolder.Direction.NONE && views[used.getValue()] != null) {
+			views[used.getValue()].offsetLeftAndRight(dx);
+			views[used.getValue()].offsetTopAndBottom(dy);
+			Log.d(TAG, "movePos: content off=" + offsetY + " left=" + views[used.getValue()].getLeft() + " top=" + views[used.getValue()].getTop());
+		}
+		for (PullPositionChangeListener listener : mListeners) {
+			listener.onUIPositionChange(dx, dy, offsetX, offsetY, isUnderTouch ? 1 : 0);
+		}
 	}
 
 	private void sendCancelEvent() {
@@ -329,23 +425,23 @@ public class PullLayout extends ViewGroup {
 	}
 
 	@Override
-	protected boolean checkLayoutParams(LayoutParams p) {
-		return p != null && p instanceof MarginLayoutParams;
+	protected boolean checkLayoutParams(ViewGroup.LayoutParams p) {
+		return p != null && p instanceof LayoutParams;
 	}
 
 	@Override
 	protected LayoutParams generateDefaultLayoutParams() {
-		return new MarginLayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT);
+		return new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT);
 	}
 
 	@Override
-	protected LayoutParams generateLayoutParams(LayoutParams p) {
-		return new MarginLayoutParams(p);
+	protected LayoutParams generateLayoutParams(ViewGroup.LayoutParams p) {
+		return new LayoutParams(p);
 	}
 
 	@Override
 	public LayoutParams generateLayoutParams(AttributeSet attrs) {
-		return new MarginLayoutParams(getContext(), attrs);
+		return new LayoutParams(getContext(), attrs);
 	}
 
 	@Override
@@ -393,7 +489,7 @@ public class PullLayout extends ViewGroup {
 		private void destroy() {
 			reset();
 			if (!mScroller.isFinished()) {
-				mScroller.forceFinished(true);
+				mScroller.abortAnimation();
 			}
 		}
 
@@ -406,4 +502,51 @@ public class PullLayout extends ViewGroup {
 			post(this);
 		}
 	}
+
+	public static class LayoutParams extends MarginLayoutParams {
+
+		public PullRefreshHolder.Direction direction = PullRefreshHolder.Direction.NONE;
+		public boolean isContent;
+
+		public int gravity = -1;
+
+		public LayoutParams(Context c, AttributeSet attrs) {
+			super(c, attrs);
+			TypedArray arr = c.obtainStyledAttributes(attrs, R.styleable.PullLayout_Layout, 0, 0);
+			if (arr != null) {
+				isContent = arr.getBoolean(R.styleable.PullLayout_Layout_pull_isContentView, false);
+				boolean isLeft = arr.getBoolean(R.styleable.PullLayout_Layout_pull_inParentLeft, false);
+				boolean isTop = arr.getBoolean(R.styleable.PullLayout_Layout_pull_inParentTop, false);
+				boolean isRight = arr.getBoolean(R.styleable.PullLayout_Layout_pull_inParentRight, false);
+				boolean isBottom = arr.getBoolean(R.styleable.PullLayout_Layout_pull_inParentBottom, false);
+				if (isLeft) {
+					direction = PullRefreshHolder.Direction.LEFT;
+				}
+				if (isTop) {
+					direction = PullRefreshHolder.Direction.TOP;
+				}
+				if (isRight) {
+					direction = PullRefreshHolder.Direction.RIGHT;
+				}
+				if (isBottom) {
+					direction = PullRefreshHolder.Direction.BOTTOM;
+				}
+				gravity = arr.getInt(R.styleable.PullLayout_Layout_android_layout_gravity, -1);
+				arr.recycle();
+			}
+		}
+
+		public LayoutParams(int width, int height) {
+			super(width, height);
+		}
+
+		public LayoutParams(MarginLayoutParams source) {
+			super(source);
+		}
+
+		public LayoutParams(ViewGroup.LayoutParams source) {
+			super(source);
+		}
+	}
+
 }

@@ -9,22 +9,22 @@
     <cn.sskbskdrin.pull.PullLayout android:id="@+id/home_pull"
                                    android:layout_width="match_parent"
                                    android:layout_height="match_parent"
-                                   android:layout_below="@id/title_layout"
-                                   app:pull_bottom_id="@+id/home_bottom"
-                                   app:pull_content_id="@+id/home_list"
-                                   app:pull_top_id="@+id/home_top">
+                                   android:layout_below="@id/title_layout">
 
-        <cn.sskbskdrin.recycler.BaseRecyclerView android:id="@id/home_list"
+        <cn.sskbskdrin.recycler.BaseRecyclerView android:id="@+id/home_list"
                                                  android:layout_width="match_parent"
-                                                 android:layout_height="match_parent"/>
-        <cn.sskbskdrin.pull.refresh.ClassicHeader android:id="@id/home_top"
+                                                 android:layout_height="match_parent"
+                                                 app:pull_isContentView="true"/>
+        <cn.sskbskdrin.pull.refresh.ClassicHeader android:id="@+id/home_top"
                                                   android:layout_width="match_parent"
-                                                  android:layout_height="wrap_content"/>
+                                                  android:layout_height="wrap_content"
+                                                  app:pull_inParentTop="true"/>
 
-        <cn.sskbskdrin.pull.refresh.MaterialHeader android:id="@id/home_bottom"
+        <cn.sskbskdrin.pull.refresh.MaterialHeader android:id="@+id/home_bottom"
                                                    android:layout_width="match_parent"
                                                    android:layout_height="wrap_content"
-                                                   android:padding="5dp"/>
+                                                   android:padding="5dp"
+                                                   app:pull_inParentBottom="true"/>
 
     </cn.sskbskdrin.pull.PullLayout>
 </RelativeLayout>

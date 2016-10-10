@@ -15,6 +15,7 @@ import cn.sskbskdrin.base.IBaseAdapter;
 import cn.sskbskdrin.pull.PullLayout;
 import cn.sskbskdrin.pull.PullRefreshCallback;
 import cn.sskbskdrin.pull.PullRefreshHolder;
+import cn.sskbskdrin.pull.refresh.MaterialHeader;
 import cn.sskbskdrin.utils.ToastUtil;
 
 public class MainActivity extends BaseFragmentActivity implements AdapterView.OnItemClickListener {
@@ -33,12 +34,17 @@ public class MainActivity extends BaseFragmentActivity implements AdapterView.On
 		final List<String> list = new ArrayList<>();
 		list.add("list");
 		list.add("grid");
+		for (int i = 0; i < 20; i++) {
+			list.add("" + i);
+		}
 		mBaseAdapter = new Adapter(this, list);
 		listView.setAdapter(mBaseAdapter);
 		listView.setOnItemClickListener(this);
 
 		mPullLayout = $(R.id.main_pull);
 		final PullRefreshHolder holder = mPullLayout.getPullRefreshHolder();
+		MaterialHeader header = $(R.id.main_bottom);
+		header.setRefreshHandler(holder);
 		holder.addPullRefreshCallback(PullRefreshHolder.Direction.TOP, new PullRefreshCallback() {
 			@Override
 			public void onUIRefreshBegin() {
@@ -70,6 +76,6 @@ public class MainActivity extends BaseFragmentActivity implements AdapterView.On
 	public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 		Intent intent = new Intent(this, ContentActivity.class);
 		intent.putExtra("fragment", mBaseAdapter.getItem(position));
-		startActivity(intent);
+//		startActivity(intent);
 	}
 }

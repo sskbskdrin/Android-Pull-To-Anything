@@ -5,8 +5,6 @@ package cn.sskbskdrin.pull;
  */
 public interface PullUIHandler extends PullPositionChangeListener, PullRefreshCallback {
 
-	int getRefreshExtent();
-
 	/**
 	 * When the content view has reached top and refresh has been completed, view will be reset.
 	 */

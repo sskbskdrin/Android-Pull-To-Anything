@@ -3,6 +3,7 @@ package cn.sskbskdrin.pull.refresh;
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.Paint;
 import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
 import android.util.AttributeSet;
@@ -44,9 +45,8 @@ public class MaterialHeader extends View implements PullUIHandler {
 		initView();
 	}
 
-	public void setRefreshHolder(PullRefreshHolder holder, PullRefreshHolder.Direction direction) {
-
-		final PullUIHandlerHook mPtrUIHandlerHook = new PullUIHandlerHook(direction) {
+	public void setRefreshHandler(PullRefreshHolder handler) {
+		final PullUIHandlerHook mPtrUIHandlerHook = new PullUIHandlerHook(PullRefreshHolder.Direction.BOTTOM) {
 			@Override
 			public void run() {
 				startAnimation(mScaleAnimation);
@@ -70,14 +70,19 @@ public class MaterialHeader extends View implements PullUIHandler {
 
 			}
 		});
-		holder.setPullUIHandlerHook(mPtrUIHandlerHook);
+		handler.setPullUIHandlerHook(mPtrUIHandlerHook);
 	}
 
 	private void initView() {
 		mDrawable = new MaterialProgressDrawable(getContext(), this);
 		mDrawable.setBackgroundColor(Color.WHITE);
 		mDrawable.setCallback(this);
+		paint.setColor(Color.CYAN);
+		paint.setStrokeWidth(5);
+
 	}
+
+	Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG);
 
 	@Override
 	public void invalidateDrawable(Drawable dr) {
@@ -95,12 +100,17 @@ public class MaterialHeader extends View implements PullUIHandler {
 
 	@Override
 	protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
-		int height = mDrawable.getIntrinsicHeight() + getPaddingTop() + getPaddingBottom();
-		int width = mDrawable.getIntrinsicWidth() + getPaddingLeft() + getPaddingRight();
-//		+ getPaddingTop() + getPaddingBottom();
-		heightMeasureSpec = MeasureSpec.makeMeasureSpec(height, MeasureSpec.EXACTLY);
-//		widthMeasureSpec = MeasureSpec.makeMeasureSpec(width, MeasureSpec.EXACTLY);
-		super.onMeasure(widthMeasureSpec, heightMeasureSpec);
+		int widthMode = MeasureSpec.getMode(widthMeasureSpec);
+		int widthSize = MeasureSpec.getSize(widthMeasureSpec);
+		int heightMode = MeasureSpec.getMode(heightMeasureSpec);
+		int heightSize = MeasureSpec.getSize(heightMeasureSpec);
+		if (widthMode == MeasureSpec.AT_MOST || widthMode == MeasureSpec.UNSPECIFIED) {
+			widthSize = mDrawable.getIntrinsicWidth() + getPaddingLeft() + getPaddingRight();
+		}
+		if (heightMode == MeasureSpec.AT_MOST || heightMode == MeasureSpec.UNSPECIFIED) {
+			heightSize = mDrawable.getIntrinsicHeight() + getPaddingTop() + getPaddingBottom();
+		}
+		setMeasuredDimension(widthSize, heightSize);
 	}
 
 	@Override
@@ -111,18 +121,19 @@ public class MaterialHeader extends View implements PullUIHandler {
 
 	@Override
 	protected void onDraw(Canvas canvas) {
+		canvas.drawLine(0, 0, getMeasuredWidth(), getMeasuredHeight(), paint);
 		final int saveCount = canvas.save();
 		Rect rect = mDrawable.getBounds();
-		int l = getPaddingLeft() + (getMeasuredWidth() - mDrawable.getIntrinsicWidth()) / 2;
-		canvas.translate(l, getPaddingTop());
+		int left = (getMeasuredWidth() - mDrawable.getIntrinsicWidth()) >> 1;
+		int top = (getMeasuredHeight() - mDrawable.getIntrinsicHeight()) >> 1;
+		canvas.translate(left, top);
 		canvas.scale(mScale, mScale, rect.exactCenterX(), rect.exactCenterY());
 		mDrawable.draw(canvas);
 		canvas.restoreToCount(saveCount);
 	}
 
-	@Override
 	public int getRefreshExtent() {
-		return mDrawable.getIntrinsicWidth() + getPaddingTop() * 2;
+		return getMeasuredHeight() < getMeasuredWidth() ? getMeasuredHeight() : getMeasuredWidth();
 	}
 
 	@Override
@@ -153,7 +164,6 @@ public class MaterialHeader extends View implements PullUIHandler {
 
 	@Override
 	public void onUIPositionChange(int dx, int dy, int offsetX, int offsetY, int status) {
-
 		float off = Math.abs(offsetX);
 		if (off == 0)
 			off = Math.abs(offsetY);

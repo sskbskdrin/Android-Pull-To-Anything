@@ -6,28 +6,26 @@
               android:orientation="vertical">
     <cn.sskbskdrin.pull.PullLayout android:id="@+id/grid_pull"
                                    android:layout_width="match_parent"
-                                   android:layout_height="match_parent"
-                                   app:pull_bottom_id="@+id/grid_bottom"
-                                   app:pull_content_id="@+id/grid_content"
-                                   app:pull_top_id="@+id/grid_top">
+                                   android:layout_height="match_parent">
 
-        <GridView android:id="@id/grid_content"
+        <GridView android:id="@+id/grid_content"
                   android:layout_width="match_parent"
                   android:layout_height="match_parent"
                   android:horizontalSpacing="5dp"
                   android:numColumns="3"
-                  android:verticalSpacing="5dp"/>
+                  android:verticalSpacing="5dp"
+                  app:pull_isContentView="true"/>
 
-        <cn.sskbskdrin.pull.refresh.ClassicHeader android:id="@id/grid_top"
+        <cn.sskbskdrin.pull.refresh.ClassicHeader android:id="@+id/grid_top"
                                                   android:layout_width="match_parent"
-                                                  android:layout_height="wrap_content"/>
+                                                  android:layout_height="wrap_content"
+                                                  app:pull_inParentTop="true"/>
 
-        <cn.sskbskdrin.pull.refresh.MaterialHeader android:id="@id/grid_bottom"
+        <cn.sskbskdrin.pull.refresh.MaterialHeader android:id="@+id/grid_bottom"
                                                    android:layout_width="match_parent"
                                                    android:layout_height="wrap_content"
                                                    android:paddingBottom="10dp"
                                                    android:paddingTop="10dp"
-                                                   app:pull_position="top"/>
-
+                                                   app:pull_inParentBottom="true"/>
     </cn.sskbskdrin.pull.PullLayout>
 </LinearLayout>
