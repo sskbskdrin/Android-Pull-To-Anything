@@ -46,7 +46,7 @@ public class MaterialHeader extends View implements PullUIHandler {
 	}
 
 	public void setRefreshHandler(PullRefreshHolder handler) {
-		final PullUIHandlerHook mPtrUIHandlerHook = new PullUIHandlerHook(PullRefreshHolder.Direction.BOTTOM) {
+		final PullUIHandlerHook mPtrUIHandlerHook = new PullUIHandlerHook(PullLayout.Direction.BOTTOM) {
 			@Override
 			public void run() {
 				startAnimation(mScaleAnimation);

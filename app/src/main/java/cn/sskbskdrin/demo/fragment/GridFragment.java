@@ -42,7 +42,7 @@ public class GridFragment extends IFragment {
 		gridView.setAdapter(mAdapter);
 		final PullLayout layout = $(R.id.grid_pull);
 		final PullRefreshHolder holder = layout.getPullRefreshHolder();
-		holder.addPullRefreshCallback(PullRefreshHolder.Direction.TOP, new PullRefreshCallback() {
+		holder.addPullRefreshCallback(PullLayout.Direction.TOP, new PullRefreshCallback() {
 			@Override
 			public void onUIRefreshBegin() {
 				layout.postDelayed(new Runnable() {
@@ -50,13 +50,13 @@ public class GridFragment extends IFragment {
 					public void run() {
 						list.add(0, "refresh header");
 						mAdapter.updateList(list);
-						holder.refreshComplete(PullRefreshHolder.Direction.TOP);
+						holder.refreshComplete(PullLayout.Direction.TOP);
 					}
 				}, 2000);
 			}
 		});
 
-		holder.addPullRefreshCallback(PullRefreshHolder.Direction.BOTTOM, new PullRefreshCallback() {
+		holder.addPullRefreshCallback(PullLayout.Direction.BOTTOM, new PullRefreshCallback() {
 			@Override
 			public void onUIRefreshBegin() {
 				layout.postDelayed(new Runnable() {
@@ -64,7 +64,7 @@ public class GridFragment extends IFragment {
 					public void run() {
 						list.add("refresh footer");
 						mAdapter.updateList(list);
-						holder.refreshComplete(PullRefreshHolder.Direction.BOTTOM);
+						holder.refreshComplete(PullLayout.Direction.BOTTOM);
 					}
 				}, 2000);
 			}

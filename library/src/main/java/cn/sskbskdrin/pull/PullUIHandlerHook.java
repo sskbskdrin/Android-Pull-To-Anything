@@ -4,21 +4,24 @@ package cn.sskbskdrin.pull;
  * Created by ayke on 2016/9/20 0020.
  */
 
+/**
+ * 刷新完成时在UI线程执行的回调方法，调用resume()恢复UI
+ */
 public abstract class PullUIHandlerHook implements Runnable {
 
 	private Runnable mResumeAction;
 
-	private PullRefreshHolder.Direction mDirection;
+	private PullLayout.Direction mDirection;
 
-	public PullUIHandlerHook(PullRefreshHolder.Direction direction) {
+	public PullUIHandlerHook(PullLayout.Direction direction) {
 		mDirection = direction;
 	}
 
-	protected void takeOver() {
+	void takeOver() {
 		run();
 	}
 
-	public PullRefreshHolder.Direction getDirection() {
+	PullLayout.Direction getDirection() {
 		return mDirection;
 	}
 
@@ -28,7 +31,7 @@ public abstract class PullUIHandlerHook implements Runnable {
 		}
 	}
 
-	protected void setResumeAction(Runnable runnable) {
+	void setResumeAction(Runnable runnable) {
 		mResumeAction = runnable;
 	}
 }

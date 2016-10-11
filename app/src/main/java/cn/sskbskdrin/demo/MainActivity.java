@@ -15,6 +15,8 @@ import cn.sskbskdrin.base.IBaseAdapter;
 import cn.sskbskdrin.pull.PullLayout;
 import cn.sskbskdrin.pull.PullRefreshCallback;
 import cn.sskbskdrin.pull.PullRefreshHolder;
+import cn.sskbskdrin.pull.PullUIHandler;
+import cn.sskbskdrin.pull.PullUIHandlerHook;
 import cn.sskbskdrin.pull.refresh.MaterialHeader;
 import cn.sskbskdrin.utils.ToastUtil;
 
@@ -45,29 +47,69 @@ public class MainActivity extends BaseFragmentActivity implements AdapterView.On
 		final PullRefreshHolder holder = mPullLayout.getPullRefreshHolder();
 		MaterialHeader header = $(R.id.main_bottom);
 		header.setRefreshHandler(holder);
-		holder.addPullRefreshCallback(PullRefreshHolder.Direction.TOP, new PullRefreshCallback() {
+		holder.addPullRefreshCallback(PullLayout.Direction.TOP, new PullRefreshCallback() {
 			@Override
 			public void onUIRefreshBegin() {
 				mPullLayout.postDelayed(new Runnable() {
 					@Override
 					public void run() {
-						holder.refreshComplete(PullRefreshHolder.Direction.TOP);
-						ToastUtil.show(getBaseContext(), "刷新完成");
+						holder.refreshComplete(PullLayout.Direction.TOP);
+//						ToastUtil.show(getBaseContext(), "刷新完成");
 					}
 				}, 2000);
 			}
 		});
 
-		holder.addPullRefreshCallback(PullRefreshHolder.Direction.BOTTOM, new PullRefreshCallback() {
+		holder.addPullRefreshCallback(PullLayout.Direction.BOTTOM, new PullRefreshCallback() {
 			@Override
 			public void onUIRefreshBegin() {
 				mPullLayout.postDelayed(new Runnable() {
 					@Override
 					public void run() {
-						holder.refreshComplete(PullRefreshHolder.Direction.BOTTOM);
+						holder.refreshComplete(PullLayout.Direction.BOTTOM);
 						ToastUtil.show(getBaseContext(), "刷新完成");
 					}
 				}, 2000);
+			}
+		});
+//		holder.setPullUIHandlerHook(new PullUIHandlerHook(PullLayout.Direction.TOP) {
+//			@Override
+//			public void run() {
+//				ToastUtil.show(getBaseContext(), "这是一个hook");
+//				resume();
+//			}
+//		});
+//		holder.set(PullLayout.Direction.TOP, 2);
+
+		holder.addUIHandler(PullLayout.Direction.TOP, new PullUIHandler() {
+			@Override
+			public void onUIReset() {
+
+			}
+
+			@Override
+			public void onUIRefreshPull() {
+
+			}
+
+			@Override
+			public void onUIRefreshPrepare() {
+
+			}
+
+			@Override
+			public void onUIRefreshComplete() {
+
+			}
+
+			@Override
+			public void onUIPositionChange(int dx, int dy, int offsetX, int offsetY, int status) {
+
+			}
+
+			@Override
+			public void onUIRefreshBegin() {
+
 			}
 		});
 	}
