@@ -40,8 +40,8 @@ public class PullDefaultCheckHandler implements PullCheckHandler {
 			if (content instanceof AbsListView) {
 				final AbsListView absListView = (AbsListView) content;
 				return absListView.getChildCount() > 0
-					&& (absListView.getFirstVisiblePosition() > 0 || absListView.getChildAt(0)
-					.getTop() < absListView.getPaddingTop());
+						&& (absListView.getFirstVisiblePosition() > 0 || absListView.getChildAt(0)
+						.getTop() < absListView.getPaddingTop());
 			} else {
 				return content.getScrollY() > 0;
 			}
@@ -49,7 +49,6 @@ public class PullDefaultCheckHandler implements PullCheckHandler {
 			return content.canScrollVertically(-1);
 		}
 	}
-
 
 	private boolean checkRight(View content) {
 		if (android.os.Build.VERSION.SDK_INT < 14) {
@@ -64,8 +63,8 @@ public class PullDefaultCheckHandler implements PullCheckHandler {
 			if (content instanceof AbsListView) {
 				final AbsListView absListView = (AbsListView) content;
 				return absListView.getChildCount() > 0
-					&& (absListView.getFirstVisiblePosition() > 0 || absListView.getChildAt(0)
-					.getTop() < absListView.getPaddingTop());
+						&& (absListView.getLastVisiblePosition() < absListView.getAdapter().getCount() - 1 ||
+						absListView.getChildAt(absListView.getChildCount() - 1).getBottom() > absListView.getPaddingBottom());
 			} else {
 				return content.getScrollY() < 0;
 			}

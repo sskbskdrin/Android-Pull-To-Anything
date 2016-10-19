@@ -13,7 +13,9 @@ import android.widget.Scroller;
 import android.widget.TextView;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Stack;
 
 /**
@@ -25,7 +27,7 @@ public class PullLayout extends ViewGroup {
 	public static final int VERTICAL = 1;
 
 	private View mContentView;
-	View[] views = new View[4];
+	private Map<Direction, View> views = new HashMap<>(4);
 
 	private boolean isPinContent = false;
 	private float mPullRangePercent = 0.6f;
@@ -44,19 +46,12 @@ public class PullLayout extends ViewGroup {
 
 	private PullCheckHandler mPullCheckHandler;
 
-	Direction mCurrentDirection;
+	private Stack<Integer> mPointIndex = new Stack<>();
+
+	private Direction mCurrentDirection;
 
 	public enum Direction {
-		LEFT(0), TOP(1), RIGHT(2), BOTTOM(3), NONE(-1);
-		int mValue;
-
-		Direction(int value) {
-			mValue = value;
-		}
-
-		public int getValue() {
-			return mValue;
-		}
+		LEFT, TOP, RIGHT, BOTTOM, NONE
 	}
 
 	public PullLayout(Context context) {
@@ -94,7 +89,7 @@ public class PullLayout extends ViewGroup {
 			if (lp.isContent) {
 				mContentView = view;
 			} else if (lp.direction != Direction.NONE) {
-				views[lp.direction.getValue()] = view;
+				views.put(lp.direction, view);
 				if (view instanceof PullUIHandler) {
 					getPullRefreshHolder().addUIHandler(lp.direction, (PullUIHandler) view);
 				}
@@ -212,7 +207,7 @@ public class PullLayout extends ViewGroup {
 						b -= offsetY;
 					view.layout(l, b - height, l + width, b);
 				}
-				views[lp.direction.getValue()] = view;
+				views.put(lp.direction, view);
 				getPullRefreshHolder().setRefreshThreshold(lp.direction, Math.min(view.getMeasuredHeight(), view.getMeasuredWidth()));
 				view.bringToFront();
 			} else {
@@ -294,8 +289,6 @@ public class PullLayout extends ViewGroup {
 		}
 		return true;
 	}
-
-	private Stack<Integer> mPointIndex = new Stack<>();
 
 	@Override
 	public boolean dispatchTouchEvent(MotionEvent ev) {
@@ -388,9 +381,9 @@ public class PullLayout extends ViewGroup {
 			mCurrentDirection = Direction.NONE;
 		}
 		Direction used = mCurrentDirection == Direction.NONE ? old : mCurrentDirection;
-		if (used != Direction.NONE && views[used.getValue()] != null) {
-			views[used.getValue()].offsetLeftAndRight(dx);
-			views[used.getValue()].offsetTopAndBottom(dy);
+		if (views.containsKey(used)) {
+			views.get(used).offsetLeftAndRight(dx);
+			views.get(used).offsetTopAndBottom(dy);
 		}
 //		Log.d(TAG, "updatePosition: dy=" + dy + "\toffsetY=" + offsetY + "\tviewBottom=" + mContentView.getBottom() + "\ttop=" + views[3].getTop() + " " + used);
 		for (PullPositionChangeListener listener : mListeners) {
@@ -542,7 +535,7 @@ public class PullLayout extends ViewGroup {
 		}
 
 		public void tryToScrollTo(int dx, int dy, int duration) {
-			Log.d(TAG, "current x=" + mPullIndicator.getCurrentX() + " y=" + mPullIndicator.getCurrentY() + "\ntryToScrollTo: dx=" + dx + " dy=" + dy);
+			Log.v(TAG, "tryToScrollTo : dx=" + dx + "\tdy=" + dy + "\tcurrent: x=" + mPullIndicator.getCurrentX() + "\ty=" + mPullIndicator.getCurrentY());
 			if (dx == 0 && dy == 0)
 				return;
 			destroy();

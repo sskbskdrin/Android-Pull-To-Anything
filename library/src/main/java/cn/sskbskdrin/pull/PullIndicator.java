@@ -4,10 +4,9 @@ import android.graphics.Point;
 import android.graphics.PointF;
 
 public class PullIndicator {
+	private static final String TAG = "PullIndicator";
 
-	public static final String TAG = "PullIndicator";
-
-	public final static int POS_START = 0;
+	private final static int POS_START = 0;
 	private PointF mPtLastMove = new PointF();
 	private Point mCurrentPosition = new Point(0, 0);
 	private int mOffsetX;
@@ -41,9 +40,6 @@ public class PullIndicator {
 	}
 
 	public void onRelease() {
-	}
-
-	public void onUIRefreshComplete() {
 	}
 
 	protected void processOnMove(float offsetX, float offsetY) {
@@ -81,14 +77,6 @@ public class PullIndicator {
 		return mOffsetY;
 	}
 
-	public int getLastX() {
-		return mLastPosition.x;
-	}
-
-	public int getLastY() {
-		return mLastPosition.y;
-	}
-
 	public int getCurrentX() {
 		return mCurrentPosition.x;
 	}
@@ -108,14 +96,6 @@ public class PullIndicator {
 
 	public boolean isInStartPosition() {
 		return mCurrentPosition.x == POS_START && mCurrentPosition.y == POS_START;
-	}
-
-	protected void onUpdatePos(int current, int last) {
-
-	}
-
-	public boolean isAlreadyHere(int to) {
-		return mCurrentPosition.y == to;
 	}
 
 	public void setIncreaseResistance(boolean increaseResistance) {

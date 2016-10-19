@@ -138,6 +138,22 @@ public class PullRefreshHolder implements PullPositionChangeListener {
 		}
 	}
 
+	/**
+	 * 设置刷新时，是否显示view
+	 *
+	 * @param direction 方位
+	 * @param show      true则刷新时显示，反之则不显示
+	 */
+	public void setRefreshShowView(Direction direction, boolean show) {
+		if (map.containsKey(direction)) {
+			map.get(direction).setRefreshShowView(show);
+		} else {
+			UIViewHolder holder = new UIViewHolder(direction);
+			holder.setRefreshShowView(show);
+			map.put(direction, holder);
+		}
+	}
+
 	int getResetExtent(Direction direction) {
 		int result = 0;
 		if (map.containsKey(direction)) {
@@ -177,7 +193,8 @@ public class PullRefreshHolder implements PullPositionChangeListener {
 		private List<PullRefreshCallback> mCallbacks;
 		private PullUIHandlerHook mHandlerHook;
 		private int mThreshold = 0;
-		private boolean isReleaseRefresh = false;
+		private boolean isReleaseRefresh = true;
+		private boolean isRefreshShowView = true;
 
 		private Direction mDirection;
 
@@ -216,6 +233,10 @@ public class PullRefreshHolder implements PullPositionChangeListener {
 
 		void setReleaseRefresh(boolean releaseRefresh) {
 			isReleaseRefresh = releaseRefresh;
+		}
+
+		void setRefreshShowView(boolean show) {
+			isRefreshShowView = show;
 		}
 
 		/**
@@ -259,19 +280,21 @@ public class PullRefreshHolder implements PullPositionChangeListener {
 
 		private int getResetExtent() {
 			int result = 0;
-			if (mStatus == STATUS_PREPARE)
-				result = mThreshold;
-			if (mStatus == STATUS_LOADING) {
-				int offsetX = Math.abs(mOffsetX);
-				int offsetY = Math.abs(mOffsetY);
-				if (isVertical()) {
-					result = Math.min(offsetY, mThreshold);
-				} else {
-					result = Math.min(offsetX, mThreshold);
+			if (isRefreshShowView) {
+				if (mStatus == STATUS_PREPARE)
+					result = mThreshold;
+				if (mStatus == STATUS_LOADING) {
+					int offsetX = Math.abs(mOffsetX);
+					int offsetY = Math.abs(mOffsetY);
+					if (isVertical()) {
+						result = Math.min(offsetY, mThreshold);
+					} else {
+						result = Math.min(offsetX, mThreshold);
+					}
 				}
+				if (mDirection == Direction.RIGHT || mDirection == Direction.BOTTOM)
+					result = -result;
 			}
-			if (mDirection == Direction.RIGHT || mDirection == Direction.BOTTOM)
-				result = -result;
 			return result;
 		}
 

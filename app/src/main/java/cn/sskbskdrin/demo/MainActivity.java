@@ -54,7 +54,7 @@ public class MainActivity extends BaseFragmentActivity implements AdapterView.On
 					@Override
 					public void run() {
 						holder.refreshComplete(PullLayout.Direction.TOP);
-//						ToastUtil.show(getBaseContext(), "刷新完成");
+						ToastUtil.show(getBaseContext(), "刷新完成");
 					}
 				}, 2000);
 			}
@@ -72,14 +72,13 @@ public class MainActivity extends BaseFragmentActivity implements AdapterView.On
 				}, 2000);
 			}
 		});
-//		holder.setPullUIHandlerHook(new PullUIHandlerHook(PullLayout.Direction.TOP) {
-//			@Override
-//			public void run() {
-//				ToastUtil.show(getBaseContext(), "这是一个hook");
-//				resume();
-//			}
-//		});
-//		holder.set(PullLayout.Direction.TOP, 2);
+		holder.setPullUIHandlerHook(new PullUIHandlerHook(PullLayout.Direction.TOP) {
+			@Override
+			public void run() {
+				ToastUtil.show(getBaseContext(), "这是一个hook");
+				resume();
+			}
+		});
 
 		holder.addUIHandler(PullLayout.Direction.TOP, new PullUIHandler() {
 			@Override
