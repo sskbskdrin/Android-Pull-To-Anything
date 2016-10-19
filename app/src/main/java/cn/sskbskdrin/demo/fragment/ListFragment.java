@@ -13,12 +13,13 @@ import cn.sskbskdrin.demo.R;
 import cn.sskbskdrin.pull.PullLayout;
 import cn.sskbskdrin.pull.PullRefreshCallback;
 import cn.sskbskdrin.pull.PullRefreshHolder;
+import cn.sskbskdrin.pull.refresh.MaterialHeader;
 
 /**
  * Created by ayke on 2016/9/26 0026.
  */
 
-public class ListFragment extends IFragment {
+public class ListFragment extends BaseFragment {
 
 	private IBaseAdapter<String> mAdapter;
 	private List<String> list = new ArrayList<>();
@@ -29,7 +30,7 @@ public class ListFragment extends IFragment {
 	}
 
 	@Override
-	protected void initView() {
+	protected void initData() {
 		ListView listView = $(R.id.list_content);
 		list = new ArrayList<>();
 		for (int i = 'A'; i < 'Z'; i++) {
@@ -37,39 +38,36 @@ public class ListFragment extends IFragment {
 		}
 		mAdapter = new Adapter(getContext(), list);
 		listView.setAdapter(mAdapter);
-		final PullLayout layout = $(R.id.list_pull);
-		final PullRefreshHolder holder = layout.getPullRefreshHolder();
-		holder.addPullRefreshCallback(PullLayout.Direction.TOP, new PullRefreshCallback() {
+		MaterialHeader footer = new MaterialHeader(getContext());
+		footer.setPadding(0, 20, 0, 20);
+		listView.addFooterView(footer);
+		mPullRefreshHolder.addUIHandler(PullLayout.Direction.BOTTOM, footer);
+		mPullRefreshHolder.addPullRefreshCallback(PullLayout.Direction.TOP, new PullRefreshCallback() {
 			@Override
 			public void onUIRefreshBegin() {
-				layout.postDelayed(new Runnable() {
+				mRootView.postDelayed(new Runnable() {
 					@Override
 					public void run() {
 						list.add(0, "refresh header");
 						mAdapter.updateList(list);
-						holder.refreshComplete(PullLayout.Direction.TOP);
+						mPullRefreshHolder.refreshComplete(PullLayout.Direction.TOP);
 					}
 				}, 2000);
 			}
 		});
 
-		holder.addPullRefreshCallback(PullLayout.Direction.BOTTOM, new PullRefreshCallback() {
+		mPullRefreshHolder.addPullRefreshCallback(PullLayout.Direction.BOTTOM, new PullRefreshCallback() {
 			@Override
 			public void onUIRefreshBegin() {
-				layout.postDelayed(new Runnable() {
+				mRootView.postDelayed(new Runnable() {
 					@Override
 					public void run() {
 						list.add("refresh footer");
 						mAdapter.updateList(list);
-						holder.refreshComplete(PullLayout.Direction.BOTTOM);
+						mPullRefreshHolder.refreshComplete(PullLayout.Direction.BOTTOM);
 					}
 				}, 2000);
 			}
 		});
-	}
-
-	@Override
-	protected void initData() {
-
 	}
 }

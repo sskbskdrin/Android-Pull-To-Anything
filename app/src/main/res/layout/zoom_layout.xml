@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<cn.sskbskdrin.pull.PullLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                               xmlns:app="http://schemas.android.com/apk/res-auto"
+                               android:layout_width="match_parent"
+                               android:layout_height="match_parent"
+                               app:pull_orientation="vertical"
+                               app:pull_pin_content="true"
+                               app:pull_resistance="1"
+                               app:pull_resistance_increase="false">
+    <ScrollView android:layout_width="match_parent"
+                android:layout_height="match_parent">
+        <LinearLayout android:layout_width="match_parent"
+                      android:layout_height="match_parent"
+                      android:orientation="vertical">
+
+            <ImageView android:id="@+id/zoom_content"
+                       android:layout_width="match_parent"
+                       android:layout_height="wrap_content"
+                       android:scaleType="centerCrop"
+                       android:src="@mipmap/meizi"/>
+            <TextView android:layout_width="match_parent"
+                      android:layout_height="200dp"
+                      android:layout_margin="10dp"
+                      android:background="#d54"
+                      android:gravity="center"
+                      android:text="I am a TextView"
+                      android:textColor="@color/white"
+                      android:textSize="30dp"/>
+            <TextView android:layout_width="match_parent"
+                      android:layout_height="300dp"
+                      android:layout_margin="10dp"
+                      android:background="#d24"
+                      android:gravity="center"
+                      android:text="I am a TextView"
+                      android:textColor="@color/white"
+                      android:textSize="30dp"/>
+            <TextView android:layout_width="match_parent"
+                      android:layout_height="250dp"
+                      android:layout_margin="10dp"
+                      android:background="#da4"
+                      android:gravity="center"
+                      android:text="I am a TextView"
+                      android:textColor="@color/white"
+                      android:textSize="30dp"/>
+        </LinearLayout>
+    </ScrollView>
+
+</cn.sskbskdrin.pull.PullLayout>

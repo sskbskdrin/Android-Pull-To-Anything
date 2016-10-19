@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ListView;
 
@@ -36,6 +37,13 @@ public class MainActivity extends BaseFragmentActivity implements AdapterView.On
 		final List<String> list = new ArrayList<>();
 		list.add("list");
 		list.add("grid");
+		list.add("RecyclerView");
+		list.add("scroll");
+		list.add("text");
+		list.add("frame");
+		list.add("viewpager");
+		list.add("web");
+		list.add("zoom");
 		for (int i = 0; i < 20; i++) {
 			list.add("" + i);
 		}
@@ -117,6 +125,6 @@ public class MainActivity extends BaseFragmentActivity implements AdapterView.On
 	public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 		Intent intent = new Intent(this, ContentActivity.class);
 		intent.putExtra("fragment", mBaseAdapter.getItem(position));
-//		startActivity(intent);
+		startActivity(intent);
 	}
 }

@@ -121,7 +121,6 @@ public class MaterialHeader extends View implements PullUIHandler {
 
 	@Override
 	protected void onDraw(Canvas canvas) {
-		canvas.drawLine(0, 0, getMeasuredWidth(), getMeasuredHeight(), paint);
 		final int saveCount = canvas.save();
 		Rect rect = mDrawable.getBounds();
 		int left = (getMeasuredWidth() - mDrawable.getIntrinsicWidth()) >> 1;

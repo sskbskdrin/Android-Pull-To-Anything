@@ -138,6 +138,7 @@ public class ClassicHeader extends FrameLayout implements PullUIHandler {
 			mRotateView.startAnimation(mReverseFlipAnimation);
 		}
 		mTitleTextView.setText(getResources().getString(R.string.cube_ptr_pull_down_to_refresh));
+		requestLayout();
 
 		mShouldShowLastUpdate = true;
 		tryUpdateLastUpdateTime();

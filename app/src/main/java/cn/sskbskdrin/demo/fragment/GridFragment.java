@@ -16,7 +16,7 @@ import cn.sskbskdrin.pull.PullRefreshHolder;
 /**
  * Created by ayke on 2016/9/26 0026.
  */
-public class GridFragment extends IFragment {
+public class GridFragment extends BaseFragment {
 
 	private IBaseAdapter<String> mAdapter;
 	private List<String> list = new ArrayList<>();
@@ -27,7 +27,7 @@ public class GridFragment extends IFragment {
 	}
 
 	@Override
-	protected void initView() {
+	protected void initData() {
 		GridView gridView = $(R.id.grid_content);
 		list = new ArrayList<>();
 		for (int i = 'A'; i < 'Z'; i++) {
@@ -40,39 +40,19 @@ public class GridFragment extends IFragment {
 			}
 		};
 		gridView.setAdapter(mAdapter);
-		final PullLayout layout = $(R.id.grid_pull);
-		final PullRefreshHolder holder = layout.getPullRefreshHolder();
-		holder.addPullRefreshCallback(PullLayout.Direction.TOP, new PullRefreshCallback() {
-			@Override
-			public void onUIRefreshBegin() {
-				layout.postDelayed(new Runnable() {
-					@Override
-					public void run() {
-						list.add(0, "refresh header");
-						mAdapter.updateList(list);
-						holder.refreshComplete(PullLayout.Direction.TOP);
-					}
-				}, 2000);
-			}
-		});
-
-		holder.addPullRefreshCallback(PullLayout.Direction.BOTTOM, new PullRefreshCallback() {
-			@Override
-			public void onUIRefreshBegin() {
-				layout.postDelayed(new Runnable() {
-					@Override
-					public void run() {
-						list.add("refresh footer");
-						mAdapter.updateList(list);
-						holder.refreshComplete(PullLayout.Direction.BOTTOM);
-					}
-				}, 2000);
-			}
-		});
 	}
 
 	@Override
-	protected void initData() {
+	protected void refreshTop() {
+		list.add(0, "refresh header");
+		mAdapter.updateList(list);
+		mPullRefreshHolder.refreshComplete(PullLayout.Direction.TOP);
+	}
 
+	@Override
+	protected void refreshBottom() {
+		list.add("refresh footer");
+		mAdapter.updateList(list);
+		mPullRefreshHolder.refreshComplete(PullLayout.Direction.BOTTOM);
 	}
 }

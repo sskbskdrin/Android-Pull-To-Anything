@@ -31,6 +31,7 @@ public class PullLayout extends ViewGroup {
 
 	private boolean isPinContent = false;
 	private float mPullRangePercent = 0.6f;
+
 	private int mCloseBackTime = 500;
 	private int mOrientation = VERTICAL;
 
@@ -451,6 +452,14 @@ public class PullLayout extends ViewGroup {
 	 */
 	public void setOrientation(int orientation) {
 		mOrientation = orientation;
+	}
+
+	public int getCloseBackTime() {
+		return mCloseBackTime;
+	}
+
+	public void setCloseBackTime(int closeBackTime) {
+		this.mCloseBackTime = closeBackTime;
 	}
 
 	public PullRefreshHolder getPullRefreshHolder() {

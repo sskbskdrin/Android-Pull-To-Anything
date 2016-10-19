@@ -98,6 +98,28 @@ public class PullRefreshHolder implements PullPositionChangeListener {
 		}
 	}
 
+	public void autoRefresh(final Direction direction) {
+		mPullLayout.postDelayed(new Runnable() {
+			@Override
+			public void run() {
+				if (map.containsKey(direction)) {
+					int threshold = map.get(direction).mThreshold + 1;
+					if (direction == Direction.BOTTOM || direction == Direction.RIGHT)
+						threshold = -threshold;
+					if (mPullLayout != null) {
+						mPullLayout.reset(threshold);
+						mPullLayout.postDelayed(new Runnable() {
+							@Override
+							public void run() {
+								onRelease(direction);
+							}
+						}, mPullLayout.getCloseBackTime());
+					}
+				}
+			}
+		}, 300);
+	}
+
 	/**
 	 * 设置刷新完成时可执行的{@link PullUIHandlerHook}
 	 *
@@ -309,7 +331,7 @@ public class PullRefreshHolder implements PullPositionChangeListener {
 					mStatus = STATUS_NONE;
 				} else if (mStatus == STATUS_COMPLETE) {
 					mStatus = STATUS_COMPLETE;
-				} else if (Math.abs(offsetX) > mThreshold || Math.abs(offsetY) > mThreshold) {
+				} else if (Math.abs(offsetX) >= mThreshold || Math.abs(offsetY) >= mThreshold) {
 					if (isReleaseRefresh)
 						mStatus = STATUS_PREPARE;
 					else
