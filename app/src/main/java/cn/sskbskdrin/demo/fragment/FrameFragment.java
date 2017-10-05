@@ -1,12 +1,12 @@
 package cn.sskbskdrin.demo.fragment;
 
+import android.util.Log;
+import android.view.View;
 import android.widget.TextView;
 
-import cn.sskbskdrin.base.IFragment;
 import cn.sskbskdrin.demo.R;
 import cn.sskbskdrin.pull.PullLayout;
 import cn.sskbskdrin.pull.PullRefreshCallback;
-import cn.sskbskdrin.pull.PullRefreshHolder;
 
 /**
  * Created by ayke on 2016/9/26 0026.
@@ -14,6 +14,7 @@ import cn.sskbskdrin.pull.PullRefreshHolder;
 
 public class FrameFragment extends BaseFragment {
 	TextView content;
+	boolean isEnable;
 
 	@Override
 	protected int getLayoutId() {
@@ -23,17 +24,20 @@ public class FrameFragment extends BaseFragment {
 	@Override
 	protected void initData() {
 		content = $(R.id.text_content);
-		mPullRefreshHolder.addPullRefreshCallback(PullLayout.Direction.TOP, new PullRefreshCallback() {
+		mPullRefreshHolder.setRefreshShowView(PullLayout.Direction.TOP, false);
+		content.setOnClickListener(new View.OnClickListener() {
 			@Override
-			public void onUIRefreshBegin() {
-				mRootView.postDelayed(new Runnable() {
-					@Override
-					public void run() {
-						content.setText("I already refresh");
-						mPullRefreshHolder.refreshComplete(PullLayout.Direction.TOP);
-					}
-				}, 2000);
+			public void onClick(View v) {
+				Log.d(TAG, "onClick: ");
+				mPullLayout.setEnable(PullLayout.Direction.BOTTOM, isEnable = !isEnable);
 			}
 		});
+
+	}
+
+	@Override
+	protected void refreshTop() {
+		content.setText("I already refresh");
+		mPullRefreshHolder.refreshComplete(PullLayout.Direction.TOP);
 	}
 }

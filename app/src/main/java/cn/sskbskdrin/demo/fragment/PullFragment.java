@@ -9,18 +9,19 @@ import cn.sskbskdrin.pull.PullLayout;
  * Created by ayke on 2016/9/26 0026.
  */
 
-public class TextFragment extends BaseFragment {
+public class PullFragment extends BaseFragment {
 	TextView content;
 
 	@Override
 	protected int getLayoutId() {
-		return R.layout.text_layout;
+		return R.layout.pager_layout;
 	}
 
 	@Override
 	protected void initData() {
-		content = $(R.id.text_content);
+		content = $(R.id.id_num);
 		mPullLayout.setPinContent(PullLayout.Direction.TOP, true);
+		mPullRefreshHolder.setReleaseRefresh(PullLayout.Direction.TOP, false);
 	}
 
 	@Override

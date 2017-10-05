@@ -6,13 +6,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 import cn.sskbskdrin.base.IBaseAdapter;
-import cn.sskbskdrin.base.IFragment;
-import cn.sskbskdrin.base.ViewHolder;
 import cn.sskbskdrin.demo.Adapter;
 import cn.sskbskdrin.demo.R;
 import cn.sskbskdrin.pull.PullLayout;
 import cn.sskbskdrin.pull.PullRefreshCallback;
-import cn.sskbskdrin.pull.PullRefreshHolder;
 import cn.sskbskdrin.pull.refresh.MaterialHeader;
 
 /**
@@ -38,36 +35,34 @@ public class ListFragment extends BaseFragment {
 		}
 		mAdapter = new Adapter(getContext(), list);
 		listView.setAdapter(mAdapter);
-		MaterialHeader footer = new MaterialHeader(getContext());
+		final MaterialHeader footer = new MaterialHeader(getContext());
 		footer.setPadding(0, 20, 0, 20);
 		listView.addFooterView(footer);
 		mPullRefreshHolder.addUIHandler(PullLayout.Direction.BOTTOM, footer);
-		mPullRefreshHolder.addPullRefreshCallback(PullLayout.Direction.TOP, new PullRefreshCallback() {
-			@Override
-			public void onUIRefreshBegin() {
-				mRootView.postDelayed(new Runnable() {
-					@Override
-					public void run() {
-						list.add(0, "refresh header");
-						mAdapter.updateList(list);
-						mPullRefreshHolder.refreshComplete(PullLayout.Direction.TOP);
-					}
-				}, 2000);
-			}
-		});
-
+		mPullRefreshHolder.setRefreshThreshold(PullLayout.Direction.BOTTOM, 100);
 		mPullRefreshHolder.addPullRefreshCallback(PullLayout.Direction.BOTTOM, new PullRefreshCallback() {
 			@Override
-			public void onUIRefreshBegin() {
+			public void onUIRefreshBegin(PullLayout.Direction direction) {
 				mRootView.postDelayed(new Runnable() {
 					@Override
 					public void run() {
-						list.add("refresh footer");
-						mAdapter.updateList(list);
+						refreshBottom();
 						mPullRefreshHolder.refreshComplete(PullLayout.Direction.BOTTOM);
 					}
-				}, 2000);
+				}, 1500);
 			}
 		});
+	}
+
+	@Override
+	protected void refreshTop() {
+		list.add(0, "refresh header");
+		mAdapter.updateList(list);
+	}
+
+	@Override
+	protected void refreshBottom() {
+		list.add("refresh footer");
+		mAdapter.updateList(list);
 	}
 }

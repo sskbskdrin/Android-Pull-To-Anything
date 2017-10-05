@@ -23,7 +23,7 @@ public class ScrollFragment extends BaseFragment {
 		content = $(R.id.scroll_text);
 		mPullRefreshHolder.addPullRefreshCallback(PullLayout.Direction.TOP, new PullRefreshCallback() {
 			@Override
-			public void onUIRefreshBegin() {
+			public void onUIRefreshBegin(PullLayout.Direction direction) {
 				mRootView.postDelayed(new Runnable() {
 					@Override
 					public void run() {

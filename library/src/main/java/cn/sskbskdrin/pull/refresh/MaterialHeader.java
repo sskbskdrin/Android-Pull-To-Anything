@@ -151,7 +151,7 @@ public class MaterialHeader extends View implements PullUIHandler {
 	}
 
 	@Override
-	public void onUIRefreshBegin() {
+	public void onUIRefreshBegin(PullLayout.Direction direction) {
 		mDrawable.setAlpha(255);
 		mDrawable.start();
 	}
@@ -164,8 +164,7 @@ public class MaterialHeader extends View implements PullUIHandler {
 	@Override
 	public void onUIPositionChange(int dx, int dy, int offsetX, int offsetY, int status) {
 		float off = Math.abs(offsetX);
-		if (off == 0)
-			off = Math.abs(offsetY);
+		if (off == 0) off = Math.abs(offsetY);
 
 		float percent = Math.min(1f, off / getRefreshExtent());
 

@@ -7,12 +7,12 @@ import android.view.View;
  */
 public interface PullCheckHandler {
 
-	public boolean checkCanDoPullLeft(final PullLayout frame, final View content);
+	boolean checkCanDoPullLeft(final PullLayout frame, final View content);
 
-	public boolean checkCanDoPullTop(final PullLayout frame, final View content);
+	boolean checkCanDoPullTop(final PullLayout frame, final View content);
 
-	public boolean checkCanDoPullRight(final PullLayout frame, final View content);
+	boolean checkCanDoPullRight(final PullLayout frame, final View content);
 
-	public boolean checkCanDoPullBottom(final PullLayout frame, final View content);
+	boolean checkCanDoPullBottom(final PullLayout frame, final View content);
 
 }

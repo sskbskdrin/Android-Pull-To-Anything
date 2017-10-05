@@ -4,11 +4,13 @@
              android:layout_height="60dp"
              android:background="@color/colorPrimary">
 
-    <TextView android:id="@+id/id_num"
-              style="@style/TextBase.body"
-              android:layout_width="match_parent"
-              android:layout_height="match_parent"
-              android:layout_gravity="center"
-              android:text="1"/>
+	<TextView
+		android:id="@+id/id_num"
+		style="@style/TextBase.body"
+		android:layout_width="match_parent"
+		android:layout_height="match_parent"
+		android:layout_gravity="center"
+		android:text="1"
+		android:textColor="@color/white"/>
 
 </FrameLayout>

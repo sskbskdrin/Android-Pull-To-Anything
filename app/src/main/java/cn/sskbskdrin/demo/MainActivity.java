@@ -2,11 +2,10 @@ package cn.sskbskdrin.demo;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.text.TextUtils;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.AdapterView;
-import android.widget.ListView;
+import android.widget.GridView;
+import android.widget.TextView;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -25,6 +24,7 @@ public class MainActivity extends BaseFragmentActivity implements AdapterView.On
 	public static final String TAG = "MainActivity";
 	private PullLayout mPullLayout;
 	private IBaseAdapter<String> mBaseAdapter;
+	private TextView mTip;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -33,19 +33,28 @@ public class MainActivity extends BaseFragmentActivity implements AdapterView.On
 
 		showTitle(R.string.app_name);
 
-		ListView listView = $(R.id.main_list);
+		mTip = (TextView) findViewById(R.id.main_tip);
+		GridView listView = $(R.id.main_grid);
 		final List<String> list = new ArrayList<>();
 		list.add("list");
 		list.add("grid");
-		list.add("RecyclerView");
+		list.add("Recycler");
 		list.add("scroll");
 		list.add("text");
 		list.add("frame");
 		list.add("viewpager");
 		list.add("web");
 		list.add("zoom");
+		list.add("hideBar");
+		list.add("enable");
+		list.add("pin");
+		list.add("pinTop");
+		list.add("pull");
+		list.add("store");
+		list.add("none");
+		list.add("tabs");
 		for (int i = 0; i < 20; i++) {
-			list.add("" + i);
+			//			list.add("" + i);
 		}
 		mBaseAdapter = new Adapter(this, list);
 		listView.setAdapter(mBaseAdapter);
@@ -55,14 +64,15 @@ public class MainActivity extends BaseFragmentActivity implements AdapterView.On
 		final PullRefreshHolder holder = mPullLayout.getPullRefreshHolder();
 		MaterialHeader header = $(R.id.main_bottom);
 		header.setRefreshHandler(holder);
+		holder.setRefreshShowView(PullLayout.Direction.TOP, false);
 		holder.addPullRefreshCallback(PullLayout.Direction.TOP, new PullRefreshCallback() {
 			@Override
-			public void onUIRefreshBegin() {
+			public void onUIRefreshBegin(PullLayout.Direction direction) {
 				mPullLayout.postDelayed(new Runnable() {
 					@Override
 					public void run() {
 						holder.refreshComplete(PullLayout.Direction.TOP);
-						ToastUtil.show(getBaseContext(), "刷新完成");
+						//						ToastUtil.show(getBaseContext(), "刷新完成");
 					}
 				}, 2000);
 			}
@@ -70,7 +80,7 @@ public class MainActivity extends BaseFragmentActivity implements AdapterView.On
 
 		holder.addPullRefreshCallback(PullLayout.Direction.BOTTOM, new PullRefreshCallback() {
 			@Override
-			public void onUIRefreshBegin() {
+			public void onUIRefreshBegin(PullLayout.Direction direction) {
 				mPullLayout.postDelayed(new Runnable() {
 					@Override
 					public void run() {
@@ -91,32 +101,31 @@ public class MainActivity extends BaseFragmentActivity implements AdapterView.On
 		holder.addUIHandler(PullLayout.Direction.TOP, new PullUIHandler() {
 			@Override
 			public void onUIReset() {
-
+				mTip.setText("reset");
 			}
 
 			@Override
 			public void onUIRefreshPull() {
-
+				mTip.setText("pull");
 			}
 
 			@Override
 			public void onUIRefreshPrepare() {
-
+				mTip.setText("Prepare");
 			}
 
 			@Override
 			public void onUIRefreshComplete() {
-
+				mTip.setText("complete");
 			}
 
 			@Override
 			public void onUIPositionChange(int dx, int dy, int offsetX, int offsetY, int status) {
-
 			}
 
 			@Override
-			public void onUIRefreshBegin() {
-
+			public void onUIRefreshBegin(PullLayout.Direction direction) {
+				mTip.setText("begin");
 			}
 		});
 	}

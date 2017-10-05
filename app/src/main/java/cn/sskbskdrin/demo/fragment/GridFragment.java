@@ -6,12 +6,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import cn.sskbskdrin.base.IBaseAdapter;
-import cn.sskbskdrin.base.IFragment;
 import cn.sskbskdrin.base.ViewHolder;
 import cn.sskbskdrin.demo.R;
 import cn.sskbskdrin.pull.PullLayout;
-import cn.sskbskdrin.pull.PullRefreshCallback;
-import cn.sskbskdrin.pull.PullRefreshHolder;
 
 /**
  * Created by ayke on 2016/9/26 0026.
@@ -32,6 +29,9 @@ public class GridFragment extends BaseFragment {
 		list = new ArrayList<>();
 		for (int i = 'A'; i < 'Z'; i++) {
 			list.add((char) i + "");
+		}
+		for (int i = 0; i < 10; i++) {
+			list.add("" + i);
 		}
 		mAdapter = new IBaseAdapter<String>(getContext(), list, R.layout.item_home) {
 			@Override

@@ -1,6 +1,7 @@
 package cn.sskbskdrin.pull;
 
-import android.util.Log;
+import android.view.View;
+
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -20,7 +21,9 @@ public class PullRefreshHolder implements PullPositionChangeListener {
 	public final static byte STATUS_LOADING = 3;
 	public final static byte STATUS_COMPLETE = 4;
 
-	private Map<Direction, UIViewHolder> map = new HashMap<>(4);
+	private final static long MIN_REFRESH_TIME = 500;
+
+	private Map<PullLayout.Direction, UIViewHolder> map = new HashMap<>(4);
 	private Direction mCurrentDirection;
 	private PullLayout mPullLayout;
 	private boolean isTouch;
@@ -78,23 +81,32 @@ public class PullRefreshHolder implements PullPositionChangeListener {
 	 *
 	 * @param direction 方位
 	 */
-	public void refreshComplete(Direction direction) {
+	public void refreshComplete(final Direction direction) {
+		UIViewHolder holder;
 		if (map.containsKey(direction)) {
-			Log.d(TAG, "reset: direction=" + direction);
-			UIViewHolder holder = map.get(direction);
-			holder.refreshComplete();
-			if (holder.getHandlerHook() != null) {
-				holder.getHandlerHook().takeOver();
-				return;
-			}
+			holder = map.get(direction);
+		} else {
+			return;
+		}
+		long time = System.currentTimeMillis() - holder.mStartTime;
+		if (time < MIN_REFRESH_TIME) {
+			mPullLayout.postDelayed(new Runnable() {
+				@Override
+				public void run() {
+					refreshComplete(direction);
+				}
+			}, MIN_REFRESH_TIME - time);
+			return;
+		}
+		holder.refreshComplete();
+		if (holder.getHandlerHook() != null) {
+			holder.getHandlerHook().takeOver();
+			return;
 		}
 		if (mPullLayout.getCurrentDirection() == direction) {
-			if (!isTouch)
-				mPullLayout.reset(getResetExtent(direction));
+			if (!isTouch) mPullLayout.reset(getResetExtent(direction));
 		} else {
-			if (map.containsKey(direction)) {
-				map.get(direction).checkStatus(0, 0, false);
-			}
+			holder.checkStatus(0, 0, false);
 		}
 	}
 
@@ -104,8 +116,7 @@ public class PullRefreshHolder implements PullPositionChangeListener {
 			public void run() {
 				if (map.containsKey(direction)) {
 					int threshold = map.get(direction).mThreshold + 1;
-					if (direction == Direction.BOTTOM || direction == Direction.RIGHT)
-						threshold = -threshold;
+					if (direction == Direction.BOTTOM || direction == Direction.RIGHT) threshold = -threshold;
 					if (mPullLayout != null) {
 						mPullLayout.reset(threshold);
 						mPullLayout.postDelayed(new Runnable() {
@@ -130,8 +141,7 @@ public class PullRefreshHolder implements PullPositionChangeListener {
 			@Override
 			public void run() {
 				if (mPullLayout.getCurrentDirection() == getDirection()) {
-					if (!isTouch)
-						mPullLayout.reset(getResetExtent(getDirection()));
+					if (!isTouch) mPullLayout.reset(getResetExtent(getDirection()));
 				} else {
 					if (map.containsKey(getDirection())) {
 						map.get(getDirection()).checkStatus(0, 0, false);
@@ -198,7 +208,7 @@ public class PullRefreshHolder implements PullPositionChangeListener {
 
 	@Override
 	public void onUIPositionChange(int dx, int dy, int offsetX, int offsetY, int status) {
-//		Log.d(TAG, "onUIPositionChange: offsetX=" + offsetX + " offsetY=" + offsetY);
+		//		Log.d(TAG, "onUIPositionChange: offsetX=" + offsetX + " offsetY=" + offsetY);
 		Direction current = mPullLayout.getCurrentDirection();
 		Direction used = current == Direction.NONE ? mCurrentDirection : current;
 		if (map.containsKey(used)) {
@@ -208,6 +218,7 @@ public class PullRefreshHolder implements PullPositionChangeListener {
 	}
 
 	private static class UIViewHolder {
+		private long mStartTime;
 		private int mStatus = STATUS_NONE;
 		private int mOffsetX = 0;
 		private int mOffsetY = 0;
@@ -226,6 +237,7 @@ public class PullRefreshHolder implements PullPositionChangeListener {
 
 		void onTouchUp() {
 			if (mStatus == STATUS_PREPARE) {
+				mStartTime = System.currentTimeMillis();
 				if (mUIHandlers != null) {
 					for (PullUIHandler handler : mUIHandlers) {
 						updateStatus(handler, STATUS_LOADING);
@@ -233,7 +245,7 @@ public class PullRefreshHolder implements PullPositionChangeListener {
 				}
 				if (mCallbacks != null) {
 					for (PullRefreshCallback callback : mCallbacks) {
-						callback.onUIRefreshBegin();
+						callback.onUIRefreshBegin(mDirection);
 					}
 				}
 			}
@@ -267,8 +279,7 @@ public class PullRefreshHolder implements PullPositionChangeListener {
 		 * @param threshold 门槛值
 		 */
 		void setRefreshThreshold(int threshold) {
-			if (mThreshold == 0)
-				this.mThreshold = threshold;
+			if (mThreshold == 0) this.mThreshold = threshold;
 		}
 
 		void setPullUIHook(PullUIHandlerHook hook) {
@@ -276,17 +287,13 @@ public class PullRefreshHolder implements PullPositionChangeListener {
 		}
 
 		void addUIHandler(PullUIHandler handler) {
-			if (mUIHandlers == null)
-				mUIHandlers = new ArrayList<>();
-			if (!mUIHandlers.contains(handler))
-				mUIHandlers.add(handler);
+			if (mUIHandlers == null) mUIHandlers = new ArrayList<>();
+			if (!mUIHandlers.contains(handler)) mUIHandlers.add(handler);
 		}
 
 		void addCallback(PullRefreshCallback callback) {
-			if (mCallbacks == null)
-				mCallbacks = new ArrayList<>();
-			if (!mCallbacks.contains(callback))
-				mCallbacks.add(callback);
+			if (mCallbacks == null) mCallbacks = new ArrayList<>();
+			if (!mCallbacks.contains(callback)) mCallbacks.add(callback);
 		}
 
 		void updatePosition(int dx, int dy, int offsetX, int offsetY, boolean touch) {
@@ -303,8 +310,7 @@ public class PullRefreshHolder implements PullPositionChangeListener {
 		private int getResetExtent() {
 			int result = 0;
 			if (isRefreshShowView) {
-				if (mStatus == STATUS_PREPARE)
-					result = mThreshold;
+				if (mStatus == STATUS_PREPARE) result = mThreshold;
 				if (mStatus == STATUS_LOADING) {
 					int offsetX = Math.abs(mOffsetX);
 					int offsetY = Math.abs(mOffsetY);
@@ -314,8 +320,7 @@ public class PullRefreshHolder implements PullPositionChangeListener {
 						result = Math.min(offsetX, mThreshold);
 					}
 				}
-				if (mDirection == Direction.RIGHT || mDirection == Direction.BOTTOM)
-					result = -result;
+				if (mDirection == Direction.RIGHT || mDirection == Direction.BOTTOM) result = -result;
 			}
 			return result;
 		}
@@ -332,10 +337,8 @@ public class PullRefreshHolder implements PullPositionChangeListener {
 				} else if (mStatus == STATUS_COMPLETE) {
 					mStatus = STATUS_COMPLETE;
 				} else if (Math.abs(offsetX) >= mThreshold || Math.abs(offsetY) >= mThreshold) {
-					if (isReleaseRefresh)
-						mStatus = STATUS_PREPARE;
-					else
-						mStatus = STATUS_LOADING;
+					if (isReleaseRefresh) mStatus = STATUS_PREPARE;
+					else mStatus = STATUS_LOADING;
 				} else {
 					mStatus = STATUS_PULL;
 				}
@@ -346,9 +349,10 @@ public class PullRefreshHolder implements PullPositionChangeListener {
 						}
 					}
 					if (mStatus == STATUS_LOADING) {
+						mStartTime = System.currentTimeMillis();
 						if (mCallbacks != null) {
 							for (PullRefreshCallback callback : mCallbacks) {
-								callback.onUIRefreshBegin();
+								callback.onUIRefreshBegin(mDirection);
 							}
 						}
 					}
@@ -369,13 +373,15 @@ public class PullRefreshHolder implements PullPositionChangeListener {
 					handler.onUIRefreshPrepare();
 					break;
 				case STATUS_LOADING:
-					handler.onUIRefreshBegin();
+					handler.onUIRefreshBegin(mDirection);
 					break;
 				case STATUS_COMPLETE:
 					handler.onUIRefreshComplete();
 					break;
 			}
-			Log.d(TAG, "updateStatus: status=" + status);
+			if (handler instanceof View) {
+				((View) handler).requestLayout();
+			}
 		}
 	}
 }

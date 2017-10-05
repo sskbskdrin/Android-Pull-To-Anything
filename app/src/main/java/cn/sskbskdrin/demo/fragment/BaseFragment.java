@@ -30,10 +30,11 @@ public abstract class BaseFragment extends IFragment {
 				}
 			}
 		}
+		if (mPullLayout == null) return;
 		mPullRefreshHolder = mPullLayout.getPullRefreshHolder();
 		mPullRefreshHolder.addPullRefreshCallback(PullLayout.Direction.LEFT, new PullRefreshCallback() {
 			@Override
-			public void onUIRefreshBegin() {
+			public void onUIRefreshBegin(PullLayout.Direction direction) {
 				mRootView.postDelayed(new Runnable() {
 					@Override
 					public void run() {
@@ -45,7 +46,7 @@ public abstract class BaseFragment extends IFragment {
 		});
 		mPullRefreshHolder.addPullRefreshCallback(PullLayout.Direction.TOP, new PullRefreshCallback() {
 			@Override
-			public void onUIRefreshBegin() {
+			public void onUIRefreshBegin(PullLayout.Direction direction) {
 				mRootView.postDelayed(new Runnable() {
 					@Override
 					public void run() {
@@ -57,7 +58,7 @@ public abstract class BaseFragment extends IFragment {
 		});
 		mPullRefreshHolder.addPullRefreshCallback(PullLayout.Direction.RIGHT, new PullRefreshCallback() {
 			@Override
-			public void onUIRefreshBegin() {
+			public void onUIRefreshBegin(PullLayout.Direction direction) {
 				mRootView.postDelayed(new Runnable() {
 					@Override
 					public void run() {
@@ -69,7 +70,7 @@ public abstract class BaseFragment extends IFragment {
 		});
 		mPullRefreshHolder.addPullRefreshCallback(PullLayout.Direction.BOTTOM, new PullRefreshCallback() {
 			@Override
-			public void onUIRefreshBegin() {
+			public void onUIRefreshBegin(PullLayout.Direction direction) {
 				mRootView.postDelayed(new Runnable() {
 					@Override
 					public void run() {

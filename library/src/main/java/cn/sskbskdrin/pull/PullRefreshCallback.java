@@ -7,6 +7,8 @@ public interface PullRefreshCallback {
 
 	/**
 	 * perform refreshing UI
+	 *
+	 * @param direction
 	 */
-	void onUIRefreshBegin();
+	void onUIRefreshBegin(PullLayout.Direction direction);
 }

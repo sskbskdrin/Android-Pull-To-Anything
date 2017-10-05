@@ -9,7 +9,7 @@ import cn.sskbskdrin.pull.PullLayout;
  * Created by ayke on 2016/9/26 0026.
  */
 
-public class TextFragment extends BaseFragment {
+public class EnableFragment extends BaseFragment {
 	TextView content;
 
 	@Override
@@ -20,7 +20,8 @@ public class TextFragment extends BaseFragment {
 	@Override
 	protected void initData() {
 		content = $(R.id.text_content);
-		mPullLayout.setPinContent(PullLayout.Direction.TOP, true);
+		content.setText("bottom is unEnable");
+		mPullLayout.setEnable(PullLayout.Direction.BOTTOM, false);
 	}
 
 	@Override

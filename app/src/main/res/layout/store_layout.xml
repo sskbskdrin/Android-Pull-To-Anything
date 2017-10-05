@@ -1,16 +1,22 @@
 <?xml version="1.0" encoding="utf-8"?>
-<cn.sskbskdrin.pull.PullLayout android:id="@+id/list_pull"
-                               xmlns:android="http://schemas.android.com/apk/res/android"
+<cn.sskbskdrin.pull.PullLayout xmlns:android="http://schemas.android.com/apk/res/android"
                                xmlns:app="http://schemas.android.com/apk/res-auto"
                                android:layout_width="match_parent"
-                               android:layout_height="match_parent">
+                               android:layout_height="match_parent"
+                               app:pull_orientation="vertical">
 
-    <ListView android:id="@+id/list_content"
+    <TextView android:id="@+id/text_content"
               android:layout_width="match_parent"
               android:layout_height="match_parent"
+              android:layout_margin="10dp"
+              android:background="#473"
+              android:gravity="center"
+              android:text="I am a TextView"
+              android:textColor="@color/white"
+              android:textSize="30sp"
               app:pull_isContentView="true"/>
 
-    <cn.sskbskdrin.pull.refresh.ClassicHeader android:id="@+id/list_top"
+    <cn.sskbskdrin.pull.refresh.StoreHouseHeader android:id="@+id/list_top"
                                               android:layout_width="match_parent"
                                               android:layout_height="wrap_content"
                                               app:pull_inParentTop="true"/>

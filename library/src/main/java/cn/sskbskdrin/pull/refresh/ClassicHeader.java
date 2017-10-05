@@ -13,6 +13,7 @@ import android.widget.TextView;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
+import cn.sskbskdrin.pull.PullLayout;
 import cn.sskbskdrin.pull.PullUIHandler;
 import cn.sskbskdrin.pull.R;
 
@@ -160,7 +161,7 @@ public class ClassicHeader extends FrameLayout implements PullUIHandler {
 	}
 
 	@Override
-	public void onUIRefreshBegin() {
+	public void onUIRefreshBegin(PullLayout.Direction direction) {
 		mShouldShowLastUpdate = false;
 		hideRotateView();
 		mProgressBar.setVisibility(VISIBLE);
