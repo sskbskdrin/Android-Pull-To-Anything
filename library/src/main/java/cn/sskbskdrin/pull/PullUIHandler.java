@@ -5,20 +5,20 @@ package cn.sskbskdrin.pull;
  */
 public interface PullUIHandler extends PullPositionChangeListener, PullRefreshCallback {
 
-	/**
-	 * When the content view has reached top and refresh has been completed, view will be reset.
-	 */
-	void onUIReset();
+    /**
+     * When the content view has reached top and refresh has been completed, view will be reset.
+     */
+    void onUIReset();
 
-	void onUIRefreshPull();
+    void onUIRefreshPull();
 
-	/**
-	 * prepare for loading
-	 */
-	void onUIRefreshPrepare();
+    /**
+     * prepare for loading
+     */
+    void onUIRefreshPrepare();
 
-	/**
-	 * perform UI after refresh
-	 */
-	void onUIRefreshComplete();
+    /**
+     * perform UI after refresh
+     */
+    void onUIRefreshComplete();
 }

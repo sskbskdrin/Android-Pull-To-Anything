@@ -1,12 +1,12 @@
 apply plugin: 'com.android.application'
 
 android {
-    compileSdkVersion 23
-    buildToolsVersion '25.0.0'
+    compileSdkVersion 25
+    buildToolsVersion '27.0.3'
     defaultConfig {
         applicationId "cn.sskbskdrin.pull"
         minSdkVersion 10
-        targetSdkVersion 23
+        targetSdkVersion 25
         versionCode 1
         versionName "1.0"
     }
@@ -19,7 +19,9 @@ android {
 }
 
 dependencies {
-    compile fileTree(include: ['*.jar'], dir: 'libs')
-    compile 'cn.sskbskdrin:ssk-base:0.0.4'
-    compile project(':library')
+    implementation fileTree(include: ['*.jar'], dir: 'libs')
+    implementation 'cn.sskbskdrin:ssk-base:0.0.4'
+    implementation project(':library')
+    implementation 'com.android.support:support-v4:25.3.0'
+    implementation 'com.android.support:recyclerview-v7:25.3.0'
 }

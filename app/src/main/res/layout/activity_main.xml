@@ -5,45 +5,45 @@
               android:layout_height="match_parent"
               android:orientation="vertical">
 
-	<include layout="@layout/title_layout"/>
+    <include layout="@layout/title_layout"/>
 
-	<cn.sskbskdrin.pull.PullLayout
-		android:id="@+id/main_pull"
-		android:layout_width="match_parent"
-		android:layout_height="match_parent"
-		app:pull_resistance="1.5"
-		app:pull_resistance_increase="true">
+    <cn.sskbskdrin.pull.PullLayout
+        android:id="@+id/main_pull"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:pull_resistance="1.5"
+        app:pull_resistance_increase="true">
 
-		<GridView
-			android:id="@+id/main_grid"
-			android:layout_width="match_parent"
-			android:layout_height="match_parent"
-			android:horizontalSpacing="5dp"
-			android:numColumns="4"
-			android:verticalSpacing="5dp"
-			app:pull_isContentView="true"/>
+        <GridView
+            android:id="@+id/main_grid"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:horizontalSpacing="5dp"
+            android:numColumns="4"
+            android:verticalSpacing="5dp"
+            app:pull_isContentView="true"/>
 
-		<cn.sskbskdrin.pull.refresh.ClassicHeader
-			android:id="@+id/main_top"
-			android:layout_width="match_parent"
-			android:layout_height="wrap_content"
-			app:pull_inParentTop="true"/>
+        <cn.sskbskdrin.pull.refresh.ClassicHeader
+            android:id="@+id/main_top"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:pull_inParentPosition="top"/>
 
-		<cn.sskbskdrin.pull.refresh.MaterialHeader
-			android:id="@+id/main_bottom"
-			android:layout_width="match_parent"
-			android:layout_height="wrap_content"
-			android:paddingBottom="10dp"
-			android:paddingTop="10dp"
-			app:pull_inParentBottom="true"/>
+        <cn.sskbskdrin.pull.refresh.MaterialHeader
+            android:id="@+id/main_bottom"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingBottom="10dp"
+            android:paddingTop="10dp"
+            app:pull_inParentPosition="bottom"/>
 
-		<TextView
-			android:id="@+id/main_tip"
-			android:layout_width="50dp"
-			android:layout_height="50dp"
-			android:layout_gravity="center"
-			android:background="@color/translucence_black"
-			android:gravity="center"
-			android:textColor="@android:color/white"/>
-	</cn.sskbskdrin.pull.PullLayout>
+        <TextView
+            android:id="@+id/main_tip"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_gravity="center"
+            android:background="@color/translucence_black"
+            android:gravity="center"
+            android:textColor="@android:color/white"/>
+    </cn.sskbskdrin.pull.PullLayout>
 </LinearLayout>

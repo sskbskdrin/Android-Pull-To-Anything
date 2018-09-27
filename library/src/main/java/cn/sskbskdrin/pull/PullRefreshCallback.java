@@ -5,10 +5,10 @@ package cn.sskbskdrin.pull;
  */
 public interface PullRefreshCallback {
 
-	/**
-	 * perform refreshing UI
-	 *
-	 * @param direction
-	 */
-	void onUIRefreshBegin(PullLayout.Direction direction);
+    /**
+     * perform refreshing UI
+     *
+     * @param direction
+     */
+    void onUIRefreshBegin(PullLayout.Direction direction);
 }

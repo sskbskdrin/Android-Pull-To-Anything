@@ -19,13 +19,13 @@
         <cn.sskbskdrin.pull.refresh.ClassicHeader android:id="@+id/grid_top"
                                                   android:layout_width="match_parent"
                                                   android:layout_height="wrap_content"
-                                                  app:pull_inParentTop="true"/>
+                                                  app:pull_inParentPosition="top"/>
 
         <cn.sskbskdrin.pull.refresh.MaterialHeader android:id="@+id/grid_bottom"
                                                    android:layout_width="match_parent"
                                                    android:layout_height="wrap_content"
                                                    android:paddingBottom="10dp"
                                                    android:paddingTop="10dp"
-                                                   app:pull_inParentBottom="true"/>
+                                                   app:pull_inParentPosition="bottom"/>
     </cn.sskbskdrin.pull.PullLayout>
 </LinearLayout>

@@ -47,5 +47,5 @@
     <cn.sskbskdrin.pull.refresh.ClassicHeader android:id="@+id/list_top"
                                               android:layout_width="match_parent"
                                               android:layout_height="wrap_content"
-                                              app:pull_inParentTop="true"/>
+                                              app:pull_inParentPosition="top"/>
 </cn.sskbskdrin.pull.PullLayout>

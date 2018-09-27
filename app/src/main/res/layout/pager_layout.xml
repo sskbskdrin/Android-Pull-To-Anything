@@ -11,10 +11,10 @@
                                                android:layout_width="match_parent"
                                                android:layout_height="wrap_content"
                                                android:padding="10dp"
-                                               app:pull_inParentTop="true"/>
+                                               app:pull_inParentPosition="top"/>
     <cn.sskbskdrin.pull.refresh.MaterialHeader android:id="@+id/page_bottom"
                                                android:layout_width="match_parent"
                                                android:layout_height="wrap_content"
                                                android:padding="10dp"
-                                               app:pull_inParentBottom="true"/>
+                                               app:pull_inParentPosition="bottom"/>
 </cn.sskbskdrin.pull.PullLayout>
