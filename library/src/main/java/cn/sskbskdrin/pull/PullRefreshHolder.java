@@ -117,7 +117,7 @@ public class PullRefreshHolder implements PullPositionChangeListener {
                     int threshold = map.get(direction).mThreshold + 1;
                     if (direction == Direction.BOTTOM || direction == Direction.RIGHT) threshold = -threshold;
                     if (mPullLayout != null) {
-                        mPullLayout.reset(threshold);
+                        mPullLayout.reset(threshold, 50);
                         mPullLayout.postDelayed(new Runnable() {
                             @Override
                             public void run() {

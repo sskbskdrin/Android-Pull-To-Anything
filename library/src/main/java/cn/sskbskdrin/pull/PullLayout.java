@@ -2,6 +2,7 @@ package cn.sskbskdrin.pull;
 
 import android.content.Context;
 import android.content.res.TypedArray;
+import android.os.Handler;
 import android.os.Parcelable;
 import android.util.AttributeSet;
 import android.view.Gravity;
@@ -281,10 +282,14 @@ public class PullLayout extends ViewGroup {
     }
 
     void reset(int offset) {
+        reset(offset, mCloseBackTime);
+    }
+
+    void reset(int offset, int duration) {
         if (isVertical()) {
-            mScrollChecker.tryToScrollTo(0, offset - mPullIndicator.getCurrentY(), mCloseBackTime);
+            mScrollChecker.tryToScrollTo(0, offset - mPullIndicator.getCurrentY(), duration);
         } else {
-            mScrollChecker.tryToScrollTo(offset - mPullIndicator.getCurrentX(), 0, mCloseBackTime);
+            mScrollChecker.tryToScrollTo(offset - mPullIndicator.getCurrentX(), 0, duration);
         }
     }
 
@@ -553,9 +558,11 @@ public class PullLayout extends ViewGroup {
         private int mLastFlingX;
         private int mLastFlingY;
         private Scroller mScroller;
+        private Handler mHandler;
 
         public ScrollChecker() {
             mScroller = new Scroller(getContext());
+            mHandler = new Handler();
         }
 
         public void run() {
@@ -566,7 +573,7 @@ public class PullLayout extends ViewGroup {
                 mLastFlingY = mScroller.getCurrY();
 
                 move(deltaX, deltaY, false);
-                post(this);
+                mHandler.post(this);
             } else {
                 finish();
             }
@@ -593,7 +600,7 @@ public class PullLayout extends ViewGroup {
             if (dx == 0 && dy == 0) return;
             destroy();
             mScroller.startScroll(0, 0, dx, dy, duration);
-            post(this);
+            mHandler.post(this);
         }
     }
 
