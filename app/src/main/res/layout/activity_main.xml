@@ -10,7 +10,8 @@
     <cn.sskbskdrin.pull.PullLayout
         android:id="@+id/main_pull"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
         app:pull_resistance="1.5"
         app:pull_resistance_increase="true">
 
@@ -46,4 +47,5 @@
             android:gravity="center"
             android:textColor="@android:color/white"/>
     </cn.sskbskdrin.pull.PullLayout>
+
 </LinearLayout>

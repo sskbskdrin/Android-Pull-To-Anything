@@ -54,6 +54,10 @@ public class PullLayout extends ViewGroup {
 
     private Direction mCurrentDirection;
 
+    private final List<View> mTempChildren = new ArrayList<>(2);
+
+    private int mTrigger = 5;
+
     public enum Direction {
         LEFT, TOP, RIGHT, BOTTOM, NONE
     }
@@ -178,8 +182,11 @@ public class PullLayout extends ViewGroup {
         int offsetX = mPullIndicator.getCurrentX();
         int offsetY = mPullIndicator.getCurrentY();
         final int count = getChildCount();
+        mTempChildren.clear();
         for (int i = 0; i < count; i++) {
-            View view = getChildAt(i);
+            mTempChildren.add(getChildAt(i));
+        }
+        for (View view : mTempChildren) {
             LayoutParams lp = (LayoutParams) view.getLayoutParams();
             if (view instanceof PullUIHandler) {
                 getPullRefreshHolder().addUIHandler(lp.direction, (PullUIHandler) view);
@@ -342,7 +349,7 @@ public class PullLayout extends ViewGroup {
                 }
                 if (checkCanDoPull(offsetX > 0, offsetY > 0, isVertical)) {
                     int offset = Math.abs(offsetX) > Math.abs(offsetY) ? Math.abs(offsetX) : Math.abs(offsetY);
-                    if (mPullIndicator.isInStartPosition() && offset < 10) {
+                    if (mPullIndicator.isInStartPosition() && offset < mTrigger) {
                         break;
                     }
                     move(offsetX, offsetY, true);
@@ -414,6 +421,15 @@ public class PullLayout extends ViewGroup {
         for (PullPositionChangeListener listener : mListeners) {
             listener.onUIPositionChange(dx, dy, offsetX, offsetY, isUnderTouch ? 1 : 0);
         }
+    }
+
+    /**
+     * 设置开始滑动响应距离px
+     *
+     * @param trigger 距离
+     */
+    public void setTrigger(int trigger) {
+        mTrigger = trigger;
     }
 
     public void setEnable(Direction direction, boolean enable) {

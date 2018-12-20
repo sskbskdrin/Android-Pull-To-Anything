@@ -1,7 +1,5 @@
 package cn.sskbskdrin.pull;
 
-import android.view.View;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -381,9 +379,6 @@ public class PullRefreshHolder implements PullPositionChangeListener {
                 case STATUS_COMPLETE:
                     handler.onUIRefreshComplete();
                     break;
-            }
-            if (handler instanceof View) {
-                ((View) handler).requestLayout();
             }
         }
     }
