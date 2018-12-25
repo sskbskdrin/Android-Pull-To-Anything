@@ -81,6 +81,9 @@ public class PullIndicator {
 
     /**
      * Update current position before update the UI
+     *
+     * @param dx 水平方向移动量
+     * @param dy 垂直方向移动量
      */
     public final void offsetPosition(int dx, int dy) {
         mLastPosition.set(mCurrentPosition.x, mCurrentPosition.y);
