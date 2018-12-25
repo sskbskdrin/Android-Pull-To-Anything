@@ -1,5 +1,13 @@
 apply plugin: 'com.android.library'
 
+Properties properties = new Properties()
+File projectPropertiesFile = project.file("project.properties")
+if (projectPropertiesFile.exists()) {
+    properties.load(projectPropertiesFile.newDataInputStream())
+}
+
+String projectVersion = properties.getProperty("project.version")
+
 android {
     compileSdkVersion 25
     buildToolsVersion '27.0.3'
@@ -8,8 +16,7 @@ android {
         minSdkVersion 10
         targetSdkVersion 25
         versionCode 1
-        versionName "1.0"
-
+        versionName projectVersion
     }
     buildTypes {
         release {
@@ -22,3 +29,5 @@ android {
 dependencies {
     implementation fileTree(include: ['*.jar'], dir: 'libs')
 }
+
+apply from: "https://sskbskdrin.github.io/bintray.gradle"
