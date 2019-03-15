@@ -51,9 +51,8 @@ public class MainActivity extends BaseFragmentActivity implements AdapterView.On
         list.add("pin");
         list.add("pinTop");
         list.add("pull");
-        list.add("store");
-        list.add("none");
         list.add("tabs");
+        list.add("none");
         for (int i = 0; i < 20; i++) {
             //			list.add("" + i);
         }

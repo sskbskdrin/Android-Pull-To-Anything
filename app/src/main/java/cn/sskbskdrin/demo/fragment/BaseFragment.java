@@ -12,85 +12,66 @@ import cn.sskbskdrin.pull.PullRefreshHolder;
  * Created by ayke on 2016/10/19 0019.
  */
 
-public abstract class BaseFragment extends IFragment {
+public abstract class BaseFragment extends IFragment implements PullRefreshCallback {
 
-	protected PullLayout mPullLayout;
-	protected PullRefreshHolder mPullRefreshHolder;
+    protected PullLayout mPullLayout;
+    protected PullRefreshHolder mPullRefreshHolder;
 
-	@CallSuper
-	@Override
-	protected void initView() {
-		if (mRootView instanceof PullLayout) {
-			mPullLayout = (PullLayout) mRootView;
-		} else {
-			for (int i = 0; i < ((ViewGroup) mRootView).getChildCount(); i++) {
-				if (((ViewGroup) mRootView).getChildAt(i) instanceof PullLayout) {
-					mPullLayout = (PullLayout) ((ViewGroup) mRootView).getChildAt(i);
-					break;
-				}
-			}
-		}
-		if (mPullLayout == null) return;
-		mPullRefreshHolder = mPullLayout.getPullRefreshHolder();
-		mPullRefreshHolder.addPullRefreshCallback(PullLayout.Direction.LEFT, new PullRefreshCallback() {
-			@Override
-			public void onUIRefreshBegin(PullLayout.Direction direction) {
-				mRootView.postDelayed(new Runnable() {
-					@Override
-					public void run() {
-						refreshLeft();
-						mPullRefreshHolder.refreshComplete(PullLayout.Direction.LEFT);
-					}
-				}, 1500);
-			}
-		});
-		mPullRefreshHolder.addPullRefreshCallback(PullLayout.Direction.TOP, new PullRefreshCallback() {
-			@Override
-			public void onUIRefreshBegin(PullLayout.Direction direction) {
-				mRootView.postDelayed(new Runnable() {
-					@Override
-					public void run() {
-						refreshTop();
-						mPullRefreshHolder.refreshComplete(PullLayout.Direction.TOP);
-					}
-				}, 1500);
-			}
-		});
-		mPullRefreshHolder.addPullRefreshCallback(PullLayout.Direction.RIGHT, new PullRefreshCallback() {
-			@Override
-			public void onUIRefreshBegin(PullLayout.Direction direction) {
-				mRootView.postDelayed(new Runnable() {
-					@Override
-					public void run() {
-						refreshRight();
-						mPullRefreshHolder.refreshComplete(PullLayout.Direction.RIGHT);
-					}
-				}, 1500);
-			}
-		});
-		mPullRefreshHolder.addPullRefreshCallback(PullLayout.Direction.BOTTOM, new PullRefreshCallback() {
-			@Override
-			public void onUIRefreshBegin(PullLayout.Direction direction) {
-				mRootView.postDelayed(new Runnable() {
-					@Override
-					public void run() {
-						refreshBottom();
-						mPullRefreshHolder.refreshComplete(PullLayout.Direction.BOTTOM);
-					}
-				}, 1500);
-			}
-		});
-	}
+    @CallSuper
+    @Override
+    protected void initView() {
+        if (mRootView instanceof PullLayout) {
+            mPullLayout = (PullLayout) mRootView;
+        } else {
+            for (int i = 0; i < ((ViewGroup) mRootView).getChildCount(); i++) {
+                if (((ViewGroup) mRootView).getChildAt(i) instanceof PullLayout) {
+                    mPullLayout = (PullLayout) ((ViewGroup) mRootView).getChildAt(i);
+                    break;
+                }
+            }
+        }
+        if (mPullLayout == null) return;
+        mPullRefreshHolder = mPullLayout.getPullRefreshHolder();
+        mPullRefreshHolder.addPullRefreshCallback(PullLayout.Direction.LEFT, this);
+        mPullRefreshHolder.addPullRefreshCallback(PullLayout.Direction.TOP, this);
+        mPullRefreshHolder.addPullRefreshCallback(PullLayout.Direction.RIGHT, this);
+        mPullRefreshHolder.addPullRefreshCallback(PullLayout.Direction.BOTTOM, this);
+    }
 
-	protected void refreshLeft() {
-	}
+    @Override
+    public void onUIRefreshBegin(final PullLayout.Direction direction) {
+        mRootView.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                switch (direction) {
+                    case TOP:
+                        refreshTop();
+                        break;
+                    case LEFT:
+                        refreshLeft();
+                        break;
+                    case RIGHT:
+                        refreshRight();
+                        break;
+                    case BOTTOM:
+                        refreshBottom();
+                        break;
+                    default:
+                }
+                mPullRefreshHolder.refreshComplete(direction);
+            }
+        }, 1000);
+    }
 
-	protected void refreshTop() {
-	}
+    protected void refreshLeft() {
+    }
 
-	protected void refreshRight() {
-	}
+    protected void refreshTop() {
+    }
 
-	protected void refreshBottom() {
-	}
+    protected void refreshRight() {
+    }
+
+    protected void refreshBottom() {
+    }
 }

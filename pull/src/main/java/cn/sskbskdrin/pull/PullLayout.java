@@ -391,11 +391,12 @@ public class PullLayout extends ViewGroup {
             sendCancelEvent();
         }
 
-        mPullIndicator.offsetPosition(deltaX, deltaY);
-        if (!getPinContent(getCurrentDirection())) {
+        if (!getPinContent(getCurrentDirection()) && preDirection(deltaX, deltaY)) {
             mContentView.offsetLeftAndRight(deltaX);
             mContentView.offsetTopAndBottom(deltaY);
         }
+
+        mPullIndicator.offsetPosition(deltaX, deltaY);
         updatePosition(deltaX, deltaY, mPullIndicator.getCurrentX(), mPullIndicator.getCurrentY(), isUnderTouch);
         invalidate();
     }
@@ -421,6 +422,25 @@ public class PullLayout extends ViewGroup {
         for (PullPositionChangeListener listener : mListeners) {
             listener.onUIPositionChange(dx, dy, offsetX, offsetY, isUnderTouch ? 1 : 0);
         }
+    }
+
+    public boolean preDirection(int dx, int dy) {
+        Direction pre;
+        if (mPullIndicator.isInStartPosition()) {
+            if (dx > 0) {
+                pre = Direction.LEFT;
+            } else if (dx < 0) {
+                pre = Direction.RIGHT;
+            } else if (dy > 0) {
+                pre = Direction.TOP;
+            } else if (dy < 0) {
+                pre = Direction.BOTTOM;
+            } else {
+                pre = Direction.NONE;
+            }
+            return !getPinContent(pre);
+        }
+        return true;
     }
 
     /**

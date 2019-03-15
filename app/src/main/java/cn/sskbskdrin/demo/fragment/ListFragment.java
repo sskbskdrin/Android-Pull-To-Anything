@@ -9,7 +9,6 @@ import cn.sskbskdrin.base.IBaseAdapter;
 import cn.sskbskdrin.demo.Adapter;
 import cn.sskbskdrin.demo.R;
 import cn.sskbskdrin.pull.PullLayout;
-import cn.sskbskdrin.pull.PullRefreshCallback;
 import cn.sskbskdrin.pull.refresh.MaterialHeader;
 
 /**
@@ -18,51 +17,42 @@ import cn.sskbskdrin.pull.refresh.MaterialHeader;
 
 public class ListFragment extends BaseFragment {
 
-	private IBaseAdapter<String> mAdapter;
-	private List<String> list = new ArrayList<>();
+    private IBaseAdapter<String> mAdapter;
+    private List<String> list = new ArrayList<>();
 
-	@Override
-	protected int getLayoutId() {
-		return R.layout.list_layout;
-	}
+    @Override
+    protected int getLayoutId() {
+        return R.layout.list_layout;
+    }
 
-	@Override
-	protected void initData() {
-		ListView listView = $(R.id.list_content);
-		list = new ArrayList<>();
-		for (int i = 'A'; i < 'Z'; i++) {
-			list.add((char) i + "");
-		}
-		mAdapter = new Adapter(getContext(), list);
-		listView.setAdapter(mAdapter);
-		final MaterialHeader footer = new MaterialHeader(getContext());
-		footer.setPadding(0, 20, 0, 20);
-		listView.addFooterView(footer);
-		mPullRefreshHolder.addUIHandler(PullLayout.Direction.BOTTOM, footer);
-		mPullRefreshHolder.setRefreshThreshold(PullLayout.Direction.BOTTOM, 100);
-		mPullRefreshHolder.addPullRefreshCallback(PullLayout.Direction.BOTTOM, new PullRefreshCallback() {
-			@Override
-			public void onUIRefreshBegin(PullLayout.Direction direction) {
-				mRootView.postDelayed(new Runnable() {
-					@Override
-					public void run() {
-						refreshBottom();
-						mPullRefreshHolder.refreshComplete(PullLayout.Direction.BOTTOM);
-					}
-				}, 1500);
-			}
-		});
-	}
+    @Override
+    protected void initData() {
+        ListView listView = $(R.id.list_content);
+        list = new ArrayList<>();
+        for (int i = 'A'; i < 'Z'; i++) {
+            list.add((char) i + "");
+        }
+        mAdapter = new Adapter(getContext(), list);
+        listView.setAdapter(mAdapter);
+        if (listView.getFooterViewsCount() == 0) {
+            final MaterialHeader footer = new MaterialHeader(getContext());
+            footer.setPadding(0, 20, 0, 20);
+            listView.addFooterView(footer);
+            mPullRefreshHolder.addUIHandler(PullLayout.Direction.BOTTOM, footer);
+            mPullRefreshHolder.setRefreshThreshold(PullLayout.Direction.BOTTOM, 100);
+            mPullRefreshHolder.addPullRefreshCallback(PullLayout.Direction.BOTTOM, this);
+        }
+    }
 
-	@Override
-	protected void refreshTop() {
-		list.add(0, "refresh header");
-		mAdapter.updateList(list);
-	}
+    @Override
+    protected void refreshTop() {
+        list.add(0, "refresh header");
+        mAdapter.updateList(list);
+    }
 
-	@Override
-	protected void refreshBottom() {
-		list.add("refresh footer");
-		mAdapter.updateList(list);
-	}
+    @Override
+    protected void refreshBottom() {
+        list.add("refresh footer");
+        mAdapter.updateList(list);
+    }
 }
